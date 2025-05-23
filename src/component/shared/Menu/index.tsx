@@ -1,10 +1,9 @@
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { TouchableOpacity } from 'react-native';
 import { Icon } from 'react-native-paper';
 import { useThemeContext } from '../../../context/ThemeContext';
 import { MenuContainer, MenuItem } from './style';
-import { GestureResponderEvent, Platform, TouchableWithoutFeedback, View } from 'react-native';
-import { transparent } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
+import { Platform, TouchableWithoutFeedback, View } from 'react-native';
 
 interface options {
   label: string;
@@ -15,10 +14,11 @@ interface options {
 interface IMenuProps {
   menuItems?: options[];
   onPress?: (item: any, index?: number) => void;
-  customMenu?: (ref: any) => ReactNode;
+  customMenu?: () => ReactNode;
   customMenuItem?: (item: any, index: number) => ReactNode;
   customToggle?: () => ReactNode;
-  anchorPosition?: string;
+  anchorPosition?: 'top' | 'bottom';
+  icon?: object
 }
 
 const Menu = ({
@@ -30,8 +30,6 @@ const Menu = ({
   ...props
 }: IMenuProps) => {
   const { theme } = useThemeContext();
-  const ref = useRef<any>({});
-
   const [visible, setVisible] = useState(false);
 
   const toggleMenu = () => {
@@ -44,7 +42,6 @@ const Menu = ({
 
   return (
     <MenuContainer
-      ref={ref}
       visible={visible}
       onDismiss={toggleMenu}
       anchor={
@@ -57,41 +54,47 @@ const Menu = ({
             {customToggle ? (
               customToggle()
             ) : (
-              <Icon source={'dots-vertical'} size={18} color={theme.colors.formButtonBackground} />
+              <Icon source={'dots-vertical'} size={18} color={theme.colors.text.primary} {...props.icon} />
             )}
           </View>
         </TouchableWithoutFeedback>
       }
       contentStyle={{
-        backgroundColor: theme.colors.background.default,
+        backgroundColor: "#ffffff",
         shadowColor: theme.colors.backdrop,
         shadowRadius: 5,
         shadowOpacity: 1,
         borderRadius: 8,
         marginTop: 10,
       }}
+      anchorPosition={props.anchorPosition}
       {...props}>
       {menuItems && menuItems.length
         ? menuItems.map((item, index) => (
-          <MenuItem
+          <TouchableOpacity
             key={index}
             onPress={() => {
               setVisible(false);
               onPress && onPress(item, index);
             }}
-            title={customMenuItem ? customMenuItem(item, index) : item.label}
             style={{
-              paddingHorizontal: 16,
-              paddingVertical: Platform.OS === 'ios' ? 10 : 15,
-              height: 'auto',
-            }}
-            titleStyle={{
-              color: theme.colors.text.textGrey,
-              fontSize: 14,
-            }}
-          />
+              backgroundColor: theme.colors.background.surface,
+            }}>
+            <MenuItem
+              title={customMenuItem ? customMenuItem(item, index) : item.label}
+              style={{
+                paddingHorizontal: 16,
+                paddingVertical: Platform.OS === 'ios' ? 10 : 15,
+                height: 'auto',
+                backgroundColor: 'transparent',
+              }}
+              titleStyle={{
+                fontSize: 16,
+              }}
+            />
+          </TouchableOpacity>
         ))
-        : customMenu && customMenu(ref)}
+        : customMenu && customMenu()}
     </MenuContainer>
   );
 };

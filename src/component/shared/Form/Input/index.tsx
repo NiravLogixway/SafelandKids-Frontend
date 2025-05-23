@@ -2,7 +2,7 @@ import React from 'react';
 import Typography from '@/component/shared/Typography';
 import { StyledInput, Wrapper, ErroWrapper } from './style';
 import { useThemeContext } from '../../../../context/ThemeContext';
-import { NativeSyntheticEvent, TextInputFocusEventData } from 'react-native';
+import { KeyboardTypeOptions, NativeSyntheticEvent, TextInputFocusEventData } from 'react-native';
 
 interface InputProps {
   error?: boolean;
@@ -17,6 +17,7 @@ interface InputProps {
   wrapperStyle?: object;
   placeholder?: string;
   roundness?: number;
+  keyboardType?: KeyboardTypeOptions;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -28,6 +29,7 @@ const Input: React.FC<InputProps> = ({
   value,
   wrapperStyle,
   roundness,
+  keyboardType,
   ...props
 }) => {
   const { theme } = useThemeContext();
@@ -56,6 +58,7 @@ const Input: React.FC<InputProps> = ({
         autoCapitalize="none"
         theme={{ roundness: roundness ?? theme.borderRadius.md, ...theme }}
         placeholderTextColor={theme.colors.input.placeholder}
+        keyboardType={keyboardType ?? 'default'}
         {...props}
       />
       {helperText && helperText !== '' && (

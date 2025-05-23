@@ -36,18 +36,8 @@ function* handleRegister({
 }: authTypes.RegisterPayload): Generator<any, void, any> {
   try {
     const payload = {...data};
-    const userRoles = yield call(authApi.getRoles);
-
-    const parentRole = userRoles.roles.find((role: any) =>
-      role.type.toLowerCase().includes('parent'),
-    );
-
-    if (parentRole?.id) {
-      payload.role = parentRole.id;
-    }
 
     const res = yield call(authApi.register, payload);
-    console.log(res, 'resssssss');
 
     if (res.jwt) {
       yield call(AsyncStorage.setItem, 'AUTH_TOKEN', res.jwt);

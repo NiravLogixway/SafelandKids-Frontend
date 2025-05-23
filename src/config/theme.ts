@@ -56,12 +56,27 @@ const FONT_MEDIUM = 'OpenSans-SemiBold';
 const FONT_BOLD = 'OpenSans-Bold';
 
 const fonts = {
-  ...configureFonts({config: fontConfig, isV3: false}),
+  ...NavigationDefaultTheme.fonts,
+  // ...configureFonts({config: fontConfig, isV3: false}),
   FONT_THIN,
   FONT_LIGHT,
   FONT_REGULAR,
   FONT_MEDIUM,
   FONT_BOLD,
+  bodyLarge: {
+    fontFamily: 'OpenSans-Regular',
+    fontWeight: 'normal',
+    fontSize: 16,
+    lineHeight: 24,
+    letterSpacing: 0.5,
+  },
+  labelLarge: {
+    fontFamily: 'OpenSans-Bold',
+    fontWeight: '500',
+    fontSize: 16,
+    lineHeight: 20,
+    letterSpacing: 0.1,
+  },
 };
 
 // Spacing constants
@@ -81,6 +96,7 @@ const borderRadius = {
   lg: 12,
   xl: 16,
   xxl: 24,
+  round: 999,
 };
 
 export const CombinedDefaultTheme = {
@@ -92,7 +108,7 @@ export const CombinedDefaultTheme = {
     onPrimary: 'rgb(255, 255, 255)',
     primaryContainer: 'rgb(255, 218, 214)',
     onPrimaryContainer: 'rgb(65, 0, 2)',
-    secondary: 'rgb(129, 86, 0)',
+    secondary: '#7A28FC',
     onSecondary: 'rgb(255, 255, 255)',
     secondaryContainer: 'rgb(255, 221, 177)',
     onSecondaryContainer: 'rgb(41, 24, 0)',
@@ -105,7 +121,7 @@ export const CombinedDefaultTheme = {
     errorContainer: 'rgb(255, 218, 214)',
     onErrorContainer: 'rgb(65, 0, 2)',
     onBackground: 'rgb(32, 26, 25)',
-    surface: 'rgb(255, 251, 255)',
+    surface: 'rgb(255, 255, 255)',
     onSurface: 'rgb(32, 26, 25)',
     surfaceVariant: 'rgb(245, 221, 219)',
     onSurfaceVariant: 'rgb(83, 67, 65)',
@@ -122,6 +138,7 @@ export const CombinedDefaultTheme = {
     info: 'rgba(27, 105, 253, 1)',
     background: {
       default: NavigationDefaultTheme.colors.background,
+      secondary: '#7A28FC',
       gradient: {
         primary: {
           colors: ['rgba(232, 93, 4, 1)', 'rgba(250, 140, 70, 1)'],
@@ -174,7 +191,7 @@ export const CombinedDarkTheme = {
   dark: true,
   colors: {
     ...NavigationDarkTheme.colors,
-    mainBg: '#121826',
+    mainBg: 'transparent',
     headerBg: '#192332',
     headerShadow: '#000000',
     bottomNavigationBg: '#1E293B',

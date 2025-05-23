@@ -1,11 +1,11 @@
 import React from 'react'
 import AppLayout from '@/layouts/AppLayout'
-import { Text } from 'react-native-paper'
+import ProfileView from './ProfileView'
 
 const Profile = () => {
   return (
-    <AppLayout title="Profile">
-      <Text>Profile</Text>
+    <AppLayout title="Account" isBack>
+      <ProfileView />
     </AppLayout>
   )
 }

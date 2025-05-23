@@ -11,3 +11,14 @@ export function navigate(name: string, params: any) {
 export function goBack() {
   navigationRef.current?.goBack();
 }
+
+export function navigateToNestedScreen(
+  tabName: string,
+  screenName: string,
+  params?: any,
+) {
+  navigationRef.current?.navigate(tabName, {
+    screen: screenName,
+    params,
+  });
+}

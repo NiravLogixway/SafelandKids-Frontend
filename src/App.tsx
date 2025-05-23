@@ -39,11 +39,13 @@ const App: React.FC<{
   pageProps: any;
 }> = () => {
   return (
-    <Provider store={store}>
-      <ThemeContext>
-        <AppContainer />
-      </ThemeContext>
-    </Provider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Provider store={store}>
+        <ThemeContext>
+          <AppContainer />
+        </ThemeContext>
+      </Provider>
+    </GestureHandlerRootView>
   );
 };
 

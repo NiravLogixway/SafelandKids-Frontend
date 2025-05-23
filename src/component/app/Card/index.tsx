@@ -61,6 +61,4 @@ const CardFooter = styled.View`
   border-bottom-right-radius: 10px;
 `;
 
-Card.Footer = ({children}) => <CardFooter>{children}</CardFooter>;
-
 export default Card;

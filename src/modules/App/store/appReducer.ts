@@ -7,7 +7,8 @@ interface AppAction {
 }
 
 const initialState: AppState = {
-  primaryStudent: {},
+  kids: [],
+  currentKid: null,
 };
 
 export default (
@@ -15,12 +16,16 @@ export default (
   {type, ...payload}: AppAction,
 ): AppState => {
   switch (type) {
-    case appTypes.SET_PRIMARY_STUDENT:
+    case appTypes.SET_CHILDS:
       return {
         ...state,
-        primaryStudent: payload.data,
+        kids: payload.data,
       };
-
+    case appTypes.SET_CURRENT_KID:
+      return {
+        ...state,
+        currentKid: payload.data,
+      };
     default:
       return state;
   }

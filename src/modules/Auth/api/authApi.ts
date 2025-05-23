@@ -1,11 +1,11 @@
 import api from '@/api';
-import {LoginPayload} from '../store/authTypes';
+import {LoginPayload, RegisterPayload} from '../store/authTypes';
 
 export const login = (data: LoginPayload['data']) => {
   return api('auth/local', data, 'post');
 };
 
-export const register = (data: LoginPayload['data']) => {
+export const register = (data: RegisterPayload['data']) => {
   return api('auth/local/register', data, 'post');
 };
 

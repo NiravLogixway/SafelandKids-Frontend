@@ -2,80 +2,111 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
-import { useThemeContext } from '@/context/ThemeContext';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // Import screens
 import Home from '@/modules/App/screens/Home';
 import Profile from '@/modules/App/screens/Profile';
-
-// Define the type for the stack navigator
-export type AppStackParamList = {
-  MainTabs: undefined;
-  Settings: undefined;
-};
+import { bottomNavigationsTab } from './constants/tabMenus';
+import ChildForm from '@/modules/App/screens/Child/ChildForm';
+import EditProfile from '@/modules/App/screens/Profile/EditProfile';
+import ChildPlaylists from '@/modules/App/screens/Child/ChildPlaylists';
+import ChildVideoPlayer from '@/modules/App/screens/Child/ChildVideoPlayer';
+import { Kid } from '@/modules/App/store/appTypes';
 
 // Define the type for the tab navigator
-export type MainTabParamList = {
+export type MainTab = {
   Home: undefined;
+  Child: undefined;
   Profile: undefined;
 };
 
-const AppStack = createNativeStackNavigator<AppStackParamList>();
-const Tab = createBottomTabNavigator<MainTabParamList>();
+// Define the type for the stack navigator
+export type HomeStack = {
+  ChildList: undefined;
+};
 
-// Bottom Tab Navigator
-const MainTabs = () => {
-  const { theme } = useThemeContext();
-  const insets = useSafeAreaInsets();
+export type ChildStack = {
+  ChildForm: { mode?: 'add' | 'edit'; kid?: Kid };
+  ChildPlaylist: undefined;
+  ChildVideoPlayer: { videoId: string };
+};
 
-  return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          const Icon = bottomNavigationActiveTab[route.name]?.icon;
-          if (Icon) {
-            if (focused === true) {
-              return <Icon size={24} color={color} />;
-            }
-            return <Icon size={24} color={color} />;
-          }
-          return null;
-        },
-        tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.text.secondary,
-        tabBarStyle: {
-          backgroundColor: theme.colors.background.primary,
-          borderTopWidth: 0,
-          elevation: 0,
-          height: 60 + insets.bottom,
-          paddingBottom: insets.bottom,
-        },
-        headerShown: false,
-      })}
-    >
-      <Tab.Screen name="Home" component={Home} />
-      <Tab.Screen name="Profile" component={Profile} />
-    </Tab.Navigator>
-  );
+export type ProfileStack = {
+  Profile: undefined;
+  EditProfile: undefined;
 };
 
 interface AppNavigatorProps {
   screenOptions?: NativeStackNavigationOptions;
 }
 
+const Tab = createBottomTabNavigator<MainTab>();
+const HomeStack = createNativeStackNavigator<HomeStack>();
+const ChildStack = createNativeStackNavigator<ChildStack>();
+const ProfileStack = createNativeStackNavigator<ProfileStack>();
+
+const HomeNav = () => {
+  return (
+    <HomeStack.Navigator screenOptions={{ headerShown: false }}>
+      <HomeStack.Screen name="ChildList" component={Home} />
+    </HomeStack.Navigator>
+  );
+};
+
+const ChildNav = () => {
+  return (
+    <ChildStack.Navigator screenOptions={{ headerShown: false }}>
+      <ChildStack.Screen name="ChildForm" component={ChildForm} />
+      <ChildStack.Screen name="ChildPlaylist" component={ChildPlaylists} />
+      <ChildStack.Screen name="ChildVideoPlayer" component={ChildVideoPlayer} />
+    </ChildStack.Navigator>
+  );
+};
+
+const ProfileNav = () => {
+  return (
+    <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
+      <ProfileStack.Screen name="Profile" component={Profile} />
+      <ProfileStack.Screen name="EditProfile" component={EditProfile} />
+    </ProfileStack.Navigator>
+  );
+};
+
 const AppNavigator: React.FC<AppNavigatorProps> = (props) => {
   return (
-    <AppStack.Navigator
-      screenOptions={{
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          const Icon = bottomNavigationsTab[route.name]?.icon;
+          const IconFocused = bottomNavigationsTab[route.name]?.iconFocused;
+          if (Icon) {
+            if (focused === true) {
+              return <IconFocused width={24} height={24} fill={color} />;
+            }
+            return <Icon width={24} height={24} fill={color} />;
+          }
+          return null;
+        },
+        tabBarActiveTintColor: "transparent",
+        tabBarInactiveTintColor: "transparent",
+        tabBarStyle: {
+          borderTopWidth: 0,
+          elevation: 0,
+          height: 60,
+          marginBlock: 10
+        },
+        tabBarLabelStyle: {
+          display: 'none',
+        },
         headerShown: false,
-      }}
-      {...props}
+        unmountOnBlur: true,
+        tabBarHideOnKeyboard: true,
+      })}
     >
-      <AppStack.Screen name="MainTabs" component={MainTabs} />
-      <AppStack.Screen name="Settings" component={Settings} />
-    </AppStack.Navigator>
+      <Tab.Screen name="Home" component={HomeNav} />
+      <Tab.Screen name="Child" component={ChildNav} />
+      <Tab.Screen name="Profile" component={ProfileNav} />
+    </Tab.Navigator>
   );
 };
 

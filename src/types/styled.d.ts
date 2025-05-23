@@ -82,6 +82,7 @@ declare module 'styled-components/native' {
       };
       background: {
         default: string;
+        secondary: string;
         gradient: {
           primary: {
             colors: string[];
@@ -113,6 +114,7 @@ declare module 'styled-components/native' {
       lg: number;
       xl: number;
       xxl: number;
+      round: number;
     };
   }
 }
