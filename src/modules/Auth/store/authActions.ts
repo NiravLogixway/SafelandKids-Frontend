@@ -1,5 +1,5 @@
 import * as authTypes from './authTypes';
-import {LoginPayload, RegisterPayload} from './authTypes';
+import {LoginPayload, RegisterPayload, UpdateUserProfilePayload} from './authTypes';
 
 export const login = (
   data: LoginPayload['data'],
@@ -38,3 +38,14 @@ export const setAuthLoading = (loading: boolean) => ({
 });
 
 export const removeAuthUser = () => ({type: authTypes.REMOVE_AUTH_USER});
+
+export const updateUserProfile = (
+  data: UpdateUserProfilePayload['data'],
+  resolve: UpdateUserProfilePayload['resolve'],
+  reject: UpdateUserProfilePayload['reject'],
+) => ({
+  type: authTypes.UPDATE_USER_PROFILE,
+  data,
+  resolve,
+  reject,
+});

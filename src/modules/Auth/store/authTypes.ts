@@ -5,6 +5,7 @@ export const USER_PROFILE = 'USER_PROFILE';
 export const SET_AUTH_USER = 'SET_AUTH_USER';
 export const SET_AUTH_LOADING = 'SET_AUTH_LOADING';
 export const REMOVE_AUTH_USER = 'REMOVE_AUTH_USER';
+export const UPDATE_USER_PROFILE = 'UPDATE_USER_PROFILE';
 
 export interface AuthState {
   loading: boolean;
@@ -32,5 +33,19 @@ export interface RegisterPayload {
     role: number;
   };
   resolve: (value: boolean) => void;
+  reject: (error: any) => void;
+}
+
+export interface UpdateUserProfilePayload {
+  data: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    username: string;
+    email: string;
+    passcode: string;
+    blocked?: boolean;
+  };
+  resolve: (value: any) => void;
   reject: (error: any) => void;
 }

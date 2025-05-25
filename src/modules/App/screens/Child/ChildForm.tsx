@@ -28,9 +28,8 @@ interface ChildData {
   age: number;
 }
 
-const ChildForm = () => {
-  const route = useRoute<ChildFormRouteProp>();
-  const { mode, kid } = route.params;
+const ChildForm = (props: any) => {
+  const { mode, kid } = props.route.params;
   const dispatch = useDispatch();
   const { theme } = useThemeContext();
   const [loader, setLoader] = useState(false);
@@ -49,10 +48,10 @@ const ChildForm = () => {
   };
 
   const isEdit = mode === 'edit';
-  const childName = `${kid?.firstName ?? ""} ${kid?.lastName ?? ""}`.trim() ?? "Add Child";
+  const childName = `${kid?.firstName ?? ""} ${kid?.lastName ?? ""}`.trim();
 
   return (
-    <AppLayout isBack title={childName}>
+    <AppLayout isBack title={mode === 'edit' ? childName : "Add Child"}>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1 }}>
         <FormContainer>
           <Form

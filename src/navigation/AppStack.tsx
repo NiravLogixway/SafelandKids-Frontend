@@ -1,111 +1,121 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
+import { useTabNavigationGuard } from '@/hooks/useTabNavigationGuard';
+import { useDispatch } from 'react-redux';
+import { getItem } from '@/utils/localstorage';
+import { navigate } from './NavigationService';
+import * as appActions from '@/modules/App/store/appActions';
+import { bottomNavigationsTab } from './constants/tabMenus';
 
-// Import screens
+// Screens
 import Home from '@/modules/App/screens/Home';
 import Profile from '@/modules/App/screens/Profile';
-import { bottomNavigationsTab } from './constants/tabMenus';
 import ChildForm from '@/modules/App/screens/Child/ChildForm';
 import EditProfile from '@/modules/App/screens/Profile/EditProfile';
-import ChildPlaylists from '@/modules/App/screens/Child/ChildPlaylists';
+import AddChildPlaylists from '@/modules/App/screens/Child/AddChildPlaylists';
 import ChildVideoPlayer from '@/modules/App/screens/Child/ChildVideoPlayer';
+import ChildPlaylist from '@/modules/App/screens/Child/ChildPlaylist';
+import Passcode from '@/modules/App/screens/Passcode';
 import { Kid } from '@/modules/App/store/appTypes';
 
-// Define the type for the tab navigator
-export type MainTab = {
-  Home: undefined;
-  Child: undefined;
-  Profile: undefined;
-};
-
-// Define the type for the stack navigator
-export type HomeStack = {
-  ChildList: undefined;
-};
-
-export type ChildStack = {
-  ChildForm: { mode?: 'add' | 'edit'; kid?: Kid };
-  ChildPlaylist: undefined;
-  ChildVideoPlayer: { videoId: string };
-};
-
-export type ProfileStack = {
-  Profile: undefined;
-  EditProfile: undefined;
-};
-
-interface AppNavigatorProps {
-  screenOptions?: NativeStackNavigationOptions;
-}
+// Tab/Stack Types
+export type MainTab = { Home: undefined; Child: undefined; Profile: undefined; };
+export type HomeStack = { ChildList: undefined; ChildVideoPlayer: { kid: Kid, videoId: string }; ChildVideoPlaylist: { kid: Kid }; Passcode: { kid: Kid } };
+export type ChildStack = { ChildForm: { mode?: 'add' | 'edit'; kid?: Kid }; ChildPlaylist: undefined; };
+export type ProfileStack = { Profile: undefined; EditProfile: undefined; };
 
 const Tab = createBottomTabNavigator<MainTab>();
 const HomeStack = createNativeStackNavigator<HomeStack>();
 const ChildStack = createNativeStackNavigator<ChildStack>();
 const ProfileStack = createNativeStackNavigator<ProfileStack>();
 
-const HomeNav = () => {
-  return (
-    <HomeStack.Navigator screenOptions={{ headerShown: false }}>
-      <HomeStack.Screen name="ChildList" component={Home} />
-    </HomeStack.Navigator>
-  );
-};
+const HomeNav = () => (
+  <HomeStack.Navigator screenOptions={{ headerShown: false }}>
+    <HomeStack.Screen name="ChildList" component={Home} />
+    <HomeStack.Screen name="ChildVideoPlaylist" component={ChildPlaylist} initialParams={{ kid: undefined }} />
+    <HomeStack.Screen name="ChildVideoPlayer" component={ChildVideoPlayer} initialParams={{ kid: undefined, videoId: undefined }} />
+    <HomeStack.Screen name="Passcode" component={Passcode} initialParams={{ kid: undefined }} />
+  </HomeStack.Navigator>
+);
 
-const ChildNav = () => {
-  return (
-    <ChildStack.Navigator screenOptions={{ headerShown: false }}>
-      <ChildStack.Screen name="ChildForm" component={ChildForm} />
-      <ChildStack.Screen name="ChildPlaylist" component={ChildPlaylists} />
-      <ChildStack.Screen name="ChildVideoPlayer" component={ChildVideoPlayer} />
-    </ChildStack.Navigator>
-  );
-};
+const ChildNav = () => (
+  <ChildStack.Navigator screenOptions={{ headerShown: false }}>
+    <ChildStack.Screen name="ChildForm" component={ChildForm} initialParams={{ mode: 'add', kid: undefined }} />
+    <ChildStack.Screen name="ChildPlaylist" component={AddChildPlaylists} />
+  </ChildStack.Navigator>
+);
 
-const ProfileNav = () => {
-  return (
-    <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
-      <ProfileStack.Screen name="Profile" component={Profile} />
-      <ProfileStack.Screen name="EditProfile" component={EditProfile} />
-    </ProfileStack.Navigator>
-  );
-};
+const ProfileNav = () => (
+  <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
+    <ProfileStack.Screen name="Profile" component={Profile} />
+    <ProfileStack.Screen name="EditProfile" component={EditProfile} />
+  </ProfileStack.Navigator>
+);
 
-const AppNavigator: React.FC<AppNavigatorProps> = (props) => {
+const getTabListeners = (isChildMode: boolean, handleTabPress: () => void) => ({
+  tabPress: (e: any) => {
+    if (isChildMode) {
+      e.preventDefault();
+      handleTabPress();
+    }
+  },
+});
+
+const AppNavigator: React.FC<{ screenOptions?: NativeStackNavigationOptions }> = (props) => {
+  const dispatch = useDispatch();
+  const { handleTabPress, isChildMode } = useTabNavigationGuard();
+
+  useEffect(() => {
+    getItem('CURRENT_KID').then((currentKid) => {
+      if (currentKid) {
+        dispatch(appActions.setCurrentKid(JSON.parse(currentKid)));
+        navigate('ChildVideoPlaylist', { kid: JSON.parse(currentKid) });
+      }
+    });
+  }, [dispatch]);
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
+        tabBarIcon: ({ focused, color }) => {
           const Icon = bottomNavigationsTab[route.name]?.icon;
           const IconFocused = bottomNavigationsTab[route.name]?.iconFocused;
           if (Icon) {
-            if (focused === true) {
-              return <IconFocused width={24} height={24} fill={color} />;
-            }
-            return <Icon width={24} height={24} fill={color} />;
+            return focused ? <IconFocused width={24} height={24} fill={color} /> : <Icon width={24} height={24} fill={color} />;
           }
           return null;
         },
-        tabBarActiveTintColor: "transparent",
-        tabBarInactiveTintColor: "transparent",
+        tabBarActiveTintColor: 'transparent',
+        tabBarInactiveTintColor: 'transparent',
         tabBarStyle: {
           borderTopWidth: 0,
           elevation: 0,
           height: 60,
-          marginBlock: 10
+          marginBlock: 10,
         },
-        tabBarLabelStyle: {
-          display: 'none',
-        },
+        tabBarLabelStyle: { display: 'none' },
         headerShown: false,
         unmountOnBlur: true,
         tabBarHideOnKeyboard: true,
       })}
     >
-      <Tab.Screen name="Home" component={HomeNav} />
-      <Tab.Screen name="Child" component={ChildNav} />
-      <Tab.Screen name="Profile" component={ProfileNav} />
+      <Tab.Screen
+        name="Home"
+        component={HomeNav}
+        listeners={getTabListeners(isChildMode, handleTabPress)}
+      />
+      <Tab.Screen
+        name="Child"
+        component={ChildNav}
+        listeners={getTabListeners(isChildMode, handleTabPress)}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileNav}
+        listeners={getTabListeners(isChildMode, handleTabPress)}
+      />
     </Tab.Navigator>
   );
 };

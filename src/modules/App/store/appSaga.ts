@@ -54,7 +54,6 @@ function* updateKid(
   try {
     const kid = action.data;
     const response = yield call(appApi.updateKid as any, kid.id, {data: kid});
-    console.log(response, 'response');
     if (response?.data?.id) {
       yield call(getKids);
       navigate('Home', {});
@@ -69,10 +68,48 @@ function* updateKid(
   }
 }
 
+function* deleteKid(
+  action: appTypes.DeleteKidAction,
+): Generator<any, void, any> {
+  try {
+    const response = yield call(appApi.deleteKid as any, action.data.id);
+    if (response?.data?.id) {
+      yield call(getKids);
+
+      toast.success('Child deleted successfully');
+      action.resolve(response.data);
+    } else {
+      action.reject(response.data);
+    }
+  } catch (error: any) {
+    toast.error(error.error?.message || 'Failed to delete child');
+    console.error('Error in deleteKid saga:', error);
+  }
+}
+
+function* deletePlaylist(
+  action: appTypes.DeletePlaylistAction,
+): Generator<any, void, any> {
+  try {
+    const response = yield call(appApi.deletePlaylist as any, action.data.id);
+    if (response?.data?.id) {
+      toast.success('Playlist deleted successfully');
+      action.resolve(response.data);
+    } else {
+      action.reject(response.data);
+    }
+  } catch (error: any) {
+    toast.error(error.error?.message || 'Failed to delete playlist');
+    console.error('Error in deletePlaylist saga:', error);
+  }
+}
+
 export function* watchSagas(): Generator<any, void, any> {
   yield takeLatest(appTypes.GET_CHILDS, getKids);
   yield takeLatest(appTypes.ADD_KID, addKid);
   yield takeLatest(appTypes.UPDATE_KID, updateKid);
+  yield takeLatest(appTypes.DELETE_KID, deleteKid);
+  yield takeLatest(appTypes.DELETE_PLAYLIST, deletePlaylist);
 }
 
 export default function* runSagas(): Generator<any, void, any> {

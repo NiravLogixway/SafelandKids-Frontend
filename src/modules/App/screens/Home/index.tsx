@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import AppLayout from '@/layouts/AppLayout';
-import { Switch, Text } from 'react-native-paper';
-import Card from '@/component/app/Card';
+import { Switch } from 'react-native-paper';
 import Menu from '@/component/shared/Menu';
 import Typography from '@/component/shared/Typography';
 import { HomeContainer, KidCardWrapper, GradientBackground, AddKidButton } from './styles';
-import { TouchableOpacity, FlatList, View } from 'react-native';
+import { TouchableOpacity, FlatList, View, Pressable } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useThemeContext } from '@/context/ThemeContext';
 import Stack from '@/component/shared/Stack';
-import { navigate } from '@/navigation/NavigationService';
+import { navigate, navigateToNestedScreen } from '@/navigation/NavigationService';
 import { useDispatch, useSelector } from 'react-redux';
 import * as appActions from '../../store/appActions';
 import { RootState } from '@/store';
 import { Kid } from '../../store/appTypes';
+import { setItem } from '@/utils/localstorage';
 
 const menuItems = [
   { label: 'Edit', value: 'edit', id: 1 },
@@ -27,32 +27,35 @@ const Home = () => {
   const currentKid = useSelector((state: RootState) => state.app.currentKid);
   const [menuVisible, setMenuVisible] = useState<number | null>(null);
 
-  console.log(currentKid, 'currentKid');
-
   useEffect(() => {
     dispatch(appActions.getKids());
   }, [dispatch]);
 
-  const handleToggle = async (kid: Kid) => {
-    console.log("called", kid)
+  const handleToggle = (kid: Kid) => {
     if (kid) {
+      setItem('CURRENT_KID', JSON.stringify(kid));
       dispatch(appActions.setCurrentKid(kid));
+      navigate('ChildVideoPlaylist', { kid });
     }
   };
 
-  const handleMenuPress = (item: any, kid: Kid) => {
+  const handleMenuPress = async (item: any, kid: Kid) => {
     if (item.value === 'edit') {
-      navigate('Child', { screen: 'ChildForm', params: { mode: 'edit', kid } });
+      navigateToNestedScreen('Child', 'ChildForm', { mode: 'edit', kid });
+    } else if (item.value === 'delete') {
+      await new Promise((resolve, reject) => {
+        dispatch(appActions.deleteKid(kid, resolve, reject))
+      })
     }
     setMenuVisible(null);
   };
 
   const handleRedirectToAddKid = () => {
-    navigate('Child', { screen: 'ChildForm', params: { mode: 'add' } });
+    navigateToNestedScreen('Child', 'ChildForm', { mode: 'add' });
   };
 
   const redirectOnChildPlaylists = (item: Kid) => {
-    navigate('Child', { screen: 'ChildPlaylist', params: { kid: item } });
+    navigateToNestedScreen('Child', 'ChildPlaylist', { kid: item });
   }
 
   const renderKidItem = ({ item }: { item: Kid }) => (
@@ -63,13 +66,20 @@ const Home = () => {
       }}
     >
       <Stack direction="row" align="center">
-        <Switch
-          value={item.id === currentKid?.id}
-          onValueChange={() => {
+        <Pressable
+          onPress={(e) => {
             if (item.id) handleToggle(item);
           }}
-          style={{ marginRight: 16 }}
-        />
+        >
+          <Switch
+            value={item.id === currentKid?.id}
+            onChange={() => {
+              if (item.id) handleToggle(item);
+            }}
+            style={{ marginRight: 16 }}
+            theme={theme}
+          />
+        </Pressable>
         <Typography variant="body1" weight={500}>{item.firstName} {item.lastName}</Typography>
       </Stack>
       <Menu

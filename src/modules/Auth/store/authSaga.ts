@@ -2,10 +2,10 @@ import {all, fork, put, call, takeLatest} from 'redux-saga/effects';
 import * as authTypes from './authTypes';
 import * as authActions from './authActions';
 import * as authApi from '../api/authApi';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import toast from '@/utils/toast';
 import {LoginPayload} from './authTypes';
 import {navigate} from '@/navigation/NavigationService';
+import {getItem, removeItem, setItem} from '@/utils/localstorage';
 
 function* handleLogin({
   data,
@@ -15,7 +15,7 @@ function* handleLogin({
   try {
     const res = yield call(authApi.login, data);
     if (res.jwt) {
-      yield call(AsyncStorage.setItem, 'AUTH_TOKEN', res.jwt);
+      yield call(setItem, 'AUTH_TOKEN', res.jwt);
       yield put(authActions.setAuthUser(res.user));
       toast.success('Login successfully');
       resolve(true);
@@ -38,9 +38,8 @@ function* handleRegister({
     const payload = {...data};
 
     const res = yield call(authApi.register, payload);
-
     if (res.jwt) {
-      yield call(AsyncStorage.setItem, 'AUTH_TOKEN', res.jwt);
+      yield call(setItem, 'AUTH_TOKEN', res.jwt);
       yield put(authActions.setAuthUser(res.user));
       toast.success('Registration successfully');
       resolve(true);
@@ -56,7 +55,7 @@ function* handleRegister({
 function* getUserProfille(): Generator<any, void, any> {
   try {
     yield put(authActions.setAuthLoading(true));
-    const token = yield call(AsyncStorage.getItem, 'AUTH_TOKEN');
+    const token = yield call(getItem, 'AUTH_TOKEN');
     if (token) {
       const profile = yield call(authApi.me);
       yield put(authActions.setAuthUser(profile));
@@ -71,15 +70,37 @@ function* getUserProfille(): Generator<any, void, any> {
   }
 }
 
+function* updateUserProfile({
+  data,
+  resolve,
+  reject,
+}: authTypes.UpdateUserProfilePayload): Generator<any, void, any> {
+  try {
+    const res = yield call(authApi.updateProfile, data);
+    if (res.id) {
+      yield put(authActions.setAuthUser(res));
+      resolve(res);
+    } else {
+      reject(res.message);
+    }
+  } catch (error: any) {
+    toast.error(error.error?.message || 'Something went wrong!!');
+    reject(error);
+  } finally {
+    yield put(authActions.setAuthLoading(false));
+  }
+}
+
 function* handleLogout(): Generator<any, void, any> {
   try {
-    yield call(AsyncStorage.removeItem, 'AUTH_TOKEN');
+    yield call(removeItem, 'AUTH_TOKEN');
+    yield call(removeItem, 'CURRENT_KID');
     yield put(authActions.removeAuthUser());
     setTimeout(() => {
       navigate('Login', {});
     }, 1000);
   } catch (error) {
-    console.log('error : ', error);
+    console.error('error : ', error);
   }
 }
 
@@ -87,6 +108,7 @@ export function* watchSagas(): Generator<any, void, any> {
   yield takeLatest(authTypes.LOGIN as any, handleLogin);
   yield takeLatest(authTypes.REGISTER as any, handleRegister);
   yield takeLatest(authTypes.USER_PROFILE as any, getUserProfille);
+  yield takeLatest(authTypes.UPDATE_USER_PROFILE as any, updateUserProfile);
   yield takeLatest(authTypes.LOGOUT as any, handleLogout);
 }
 

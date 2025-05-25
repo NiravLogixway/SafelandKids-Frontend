@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {NavigationContainerRef} from '@react-navigation/native';
+import {NavigationContainerRef, CommonActions} from '@react-navigation/native';
 
 // NavigationContainer is referred here - Check NavigationStack
 export const navigationRef = React.createRef<NavigationContainerRef<any>>();
@@ -17,8 +17,19 @@ export function navigateToNestedScreen(
   screenName: string,
   params?: any,
 ) {
-  navigationRef.current?.navigate(tabName, {
-    screen: screenName,
-    params,
-  });
+  navigationRef.current?.dispatch(
+    CommonActions.navigate({
+      name: tabName,
+      params: {
+        screen: screenName,
+        params,
+      },
+    }),
+  );
+}
+
+export function goBackWithDispatch() {
+  if (navigationRef.current) {
+    navigationRef.current.dispatch(CommonActions.goBack());
+  }
 }

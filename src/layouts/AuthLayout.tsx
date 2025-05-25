@@ -11,7 +11,6 @@ interface AppLayoutProps {
   children: ReactNode;
   title?: string;
   titleColor?: string;
-  isShowIcon?: boolean;
   isBack?: boolean;
   navigateLink?: string;
 }
@@ -20,7 +19,6 @@ const AuthLayout = ({
   children,
   title,
   titleColor,
-  isShowIcon,
   isBack,
   navigateLink,
 }: AppLayoutProps) => {
@@ -37,7 +35,6 @@ const AuthLayout = ({
             <Header
               title={title}
               titleColor={titleColor}
-              isShowIcon={isShowIcon}
               isBack={isBack}
               navigateLink={navigateLink}
             />

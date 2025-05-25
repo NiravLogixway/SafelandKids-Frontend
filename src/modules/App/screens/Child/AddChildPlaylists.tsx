@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AppLayout from '@/layouts/AppLayout';
 import { useThemeContext } from '@/context/ThemeContext';
 import Typography from '@/component/shared/Typography';
@@ -7,7 +7,7 @@ import Menu from '@/component/shared/Menu';
 import { Image, Pressable, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { fetchYoutubeOEmbed } from '@/modules/App/api/appApi';
+import { fetchYoutubeOEmbed, addChildPlaylist, YoutubeOEmbedResponse, getChildPlaylists } from '@/modules/App/api/appApi';
 import Clipboard from '@react-native-clipboard/clipboard';
 import {
   StyledGradientButton,
@@ -23,6 +23,22 @@ import {
   VideoPreviewTitleText
 } from './styles';
 import { Kid } from '../../store/appTypes';
+import { navigateToNestedScreen } from '@/navigation/NavigationService';
+import toast from '@/utils/toast';
+import { useDispatch } from 'react-redux';
+import * as appActions from '@/modules/App/store/appActions';
+
+interface VideoProps {
+  id?: number;
+  name: string;
+  url: string;
+  isShow: boolean;
+  isCompleted: boolean;
+  watchDuration: number;
+  child: number;
+  image: string;
+  order: number;
+}
 
 // --- Types for reusable components ---
 interface VideoLinkInputProps {
@@ -30,6 +46,14 @@ interface VideoLinkInputProps {
   onPaste: () => void;
   onRemove?: () => void;
   error?: string;
+}
+
+interface VideoPreviewCardProps {
+  title: string;
+  thumbnail: string;
+  onMenuPress: (item: any, idx: number) => void;
+  menuItems: any[];
+  index: number;
 }
 
 const VideoLinkInput: React.FC<VideoLinkInputProps> = ({ value, onPaste, onRemove, error }) => {
@@ -73,14 +97,6 @@ const VideoLinkInput: React.FC<VideoLinkInputProps> = ({ value, onPaste, onRemov
     </VideoLinkContainer>
   );
 };
-
-interface VideoPreviewCardProps {
-  title: string;
-  thumbnail: string;
-  onMenuPress: (item: any, idx: number) => void;
-  menuItems: any[];
-  index: number;
-}
 
 const VideoPreviewCard: React.FC<VideoPreviewCardProps> = ({ title, thumbnail, onMenuPress, menuItems, index }) => {
   const { theme } = useThemeContext();
@@ -130,39 +146,91 @@ const GradientButton = ({ onPress, children, disabled, loading, iconName, border
   );
 };
 
-const ChildPlaylists = (props: any) => {
+const defaultVideo = {
+  name: '',
+  url: '',
+  order: 0,
+  isShow: true,
+  isCompleted: false,
+  watchDuration: 0,
+  image: '',
+};
+
+const AddChildPlaylists = (props: any) => {
   const { kid } = props.route.params;
   const { theme } = useThemeContext();
-  const [links, setLinks] = useState<string[]>(['']);
-  const [previews, setPreviews] = useState<{ title: string; thumbnail: string; url: string }[]>([]);
+  const dispatch = useDispatch();
+  const [videos, setVideos] = useState<VideoProps[]>([]);
   const [mode, setMode] = useState<'input' | 'preview'>('input');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: number]: string }>({});
 
   const childName = `${kid.firstName ?? ""} ${kid.lastName ?? ""}`.trim() ?? "Child";
 
+  useEffect(() => {
+    if (kid.id) {
+      setLoading(true);
+      getChildPlaylists(kid.id).then(res => {
+        if (res.length > 0) {
+          setVideos(res);
+        } else {
+          setVideos([{ ...defaultVideo, child: kid.id }]);
+        }
+      }).finally(() => {
+        setLoading(false);
+      });
+    }
+    return () => {
+      setVideos([]);
+
+    }
+  }, [kid.id]);
+
+  const handleAddMore = () => {
+    const lastVideo = videos[videos.length - 1];
+    if (!lastVideo || !lastVideo.url.trim()) {
+      setErrors(prev => ({ ...prev, [videos.length - 1]: 'Paste a youtube URL here' }));
+      return;
+    }
+    setVideos([...videos, {
+      name: '',
+      url: '',
+      isShow: true,
+      isCompleted: false,
+      watchDuration: 0,
+      child: kid.id,
+      image: '',
+      order: videos.length + 1,
+    }]);
+    setErrors(prev => ({ ...prev, [videos.length]: '' }));
+  };
+
+  const handleRemove = (idx: number) => {
+    setVideos(videos => videos.filter((_, i) => i !== idx).map((item, i) => ({ ...item, order: i + 1 })));
+    setErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors[idx];
+      return newErrors;
+    });
+  };
+
   const handlePaste = async (idx: number): Promise<void> => {
-    let error = "";
+    let error = '';
     try {
       const text = await Clipboard.getString();
       if (!text) {
         error = 'No text found in clipboard';
       }
-
       const videoId = extractVideoId(text);
       if (!videoId) {
         error = 'Please paste a valid YouTube video URL';
       }
-
-      const isDuplicate = links.some((link, i) => i !== idx && link === text);
+      const isDuplicate = videos.some((video, i) => i !== idx && video.url === text);
       if (isDuplicate) {
         error = 'This video has already been added';
       }
-
       if (!error) {
-        setLinks(prevLinks =>
-          prevLinks.map((link, i) => (i === idx ? text : link))
-        );
+        setVideos(videos => videos.map((video, i) => i === idx ? { ...video, url: text } : video));
       }
     } catch {
       error = 'Failed to paste from clipboard';
@@ -190,66 +258,86 @@ const ChildPlaylists = (props: any) => {
     return null;
   };
 
-  const handleAddMore = () => {
-    const lastLink = links[links.length - 1];
-    if (!lastLink.trim()) {
-      setErrors(prev => ({ ...prev, [links.length - 1]: 'Paste a youtube URL here' }));
-      return;
-    }
-
-    setLinks([...links, '']);
-    setErrors(prev => ({ ...prev, [links.length]: '' }));
-  };
-
-  const handleRemove = (idx: number) => {
-    setLinks(links => links.filter((_, i) => i !== idx));
-    setErrors(prev => {
-      const newErrors = { ...prev };
-      delete newErrors[idx];
-      return newErrors;
-    });
-  };
-
   const handleDone = async () => {
     setLoading(true);
-    const details = await Promise.all(
-      links.map(async (link) => {
-        try {
-          const data = await fetchYoutubeOEmbed(link);
-          console.log(data)
-          return { title: data.title, thumbnail: data.thumbnail_url, url: link };
-        } catch {
-          return { title: 'Invalid Link', thumbnail: '', url: link };
-        }
-      })
-    );
-    setPreviews(details);
+    const filteredVideos = videos.filter(video => video.url.trim());
+    const promises = filteredVideos.map(video => fetchYoutubeOEmbed(video.url));
+    const details = await Promise.all(promises);
+    setVideos(videos => filteredVideos.map((video, i) => details[i] ? {
+      ...video,
+      name: details[i].title,
+      image: details[i].thumbnail_url,
+    } : video));
     setMode('preview');
     setLoading(false);
   };
 
-  const handleMenuPress = (item: any, idx: number) => {
-    if (item.value === 'delete') {
-      setPreviews(previews => previews.filter((_, i) => i !== idx));
+  function getMenuItems(idx: number, total: number) {
+    const items = [
+      { label: 'Edit', value: 'edit', id: 1 },
+      { label: 'Move Up', value: 'moveUp', id: 2 },
+      { label: 'Move Down', value: 'moveDown', id: 3 },
+      { label: 'Delete', value: 'delete', id: 4 },
+    ];
+    if (total === 1) return [items[0], items[3]];
+    if (idx === 0) return [items[0], items[2], items[3]];
+    if (idx === total - 1) return [items[0], items[1], items[3]];
+    return items;
+  }
+
+  function moveVideo(videos: any[], fromIdx: number, toIdx: number) {
+    if (toIdx < 0 || toIdx >= videos.length) return videos;
+    const updated = [...videos];
+    const [moved] = updated.splice(fromIdx, 1);
+    updated.splice(toIdx, 0, moved);
+    return updated.map((item, idx) => ({ ...item, order: idx + 1 }));
+  }
+
+  const handleDelete = async (idx: number) => {
+    setVideos(videos => videos.filter((_, i) => i !== idx).map((item, i) => ({ ...item, order: i + 1 })));
+    const playlistId = videos[idx].id;
+    if (playlistId) {
+      await new Promise((resolve, reject) => {
+        dispatch(appActions.deletePlaylist(playlistId, resolve, reject))
+      })
     }
-    // Add more menu actions if needed
   };
 
-  const menuItems = [
-    { label: 'Delete', value: 'delete', id: 1 },
-  ];
+  const handleMenuPress = (item: any, idx: number) => {
+    if (item.value === 'delete') {
+      handleDelete(idx);
+    } else if (item.value === 'moveUp') {
+      setVideos(videos => moveVideo(videos, idx, idx - 1));
+    } else if (item.value === 'moveDown') {
+      setVideos(videos => moveVideo(videos, idx, idx + 1));
+    } else if (item.value === 'edit') {
+      setMode('input');
+    }
+  };
+
+  const handleFinish = async () => {
+    setLoading(true);
+    try {
+      await addChildPlaylist(videos);
+      toast.success('Playlists added successfully');
+      navigateToNestedScreen('Home', 'ChildList', { kid });
+    } catch (e) {
+      console.error(e);
+    }
+    setLoading(false);
+  };
 
   return (
     <AppLayout isBack title={childName}>
       {mode === 'input' ? (
         <>
           <ScrollView contentContainerStyle={{ flexGrow: 1, padding: theme.spacing.lg }}>
-            {links.map((link, idx) => (
+            {videos.map((video, idx) => (
               <VideoLinkInput
                 key={idx}
-                value={link}
+                value={video.url}
                 onPaste={() => handlePaste(idx)}
-                onRemove={links.length > 1 ? () => handleRemove(idx) : undefined}
+                onRemove={videos.length > 1 ? () => handleRemove(idx) : undefined}
                 error={errors[idx]}
               />
             ))}
@@ -258,7 +346,7 @@ const ChildPlaylists = (props: any) => {
             <GradientButton onPress={handleAddMore} iconName="add">
               Add more
             </GradientButton>
-            <GradientButton onPress={handleDone} iconName="check" disabled={links.some(l => !l)} loading={loading}>
+            <GradientButton onPress={handleDone} iconName="check" disabled={!videos.some(v => v.url.trim())} loading={loading}>
               Done
             </GradientButton>
           </Stack>
@@ -266,12 +354,12 @@ const ChildPlaylists = (props: any) => {
       ) : (
         <>
           <ScrollView contentContainerStyle={{ flexGrow: 1, padding: theme.spacing.lg }}>
-            {previews.map((preview, idx) => (
+            {videos.map((video, idx) => (
               <VideoPreviewCard
                 key={idx}
-                title={preview.title}
-                thumbnail={preview.thumbnail}
-                menuItems={menuItems}
+                title={video.name}
+                thumbnail={video.image}
+                menuItems={getMenuItems(idx, videos.length)}
                 onMenuPress={handleMenuPress}
                 index={idx}
               />
@@ -281,7 +369,7 @@ const ChildPlaylists = (props: any) => {
             <GradientButton onPress={() => setMode('input')} iconName="add">
               Add Video Link(s)
             </GradientButton>
-            <GradientButton onPress={() => {/* handle finish action */ }} iconName="check">
+            <GradientButton onPress={handleFinish} iconName="check" loading={loading}>
               Finish
             </GradientButton>
           </Stack>
@@ -291,4 +379,4 @@ const ChildPlaylists = (props: any) => {
   );
 };
 
-export default ChildPlaylists;
+export default AddChildPlaylists;

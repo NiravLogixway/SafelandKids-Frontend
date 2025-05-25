@@ -9,32 +9,26 @@ import Header from '../component/app/Header';
 import bg2Image from '@/assets/images/bg2Image.png';
 
 interface AppLayoutProps {
-  route?: any;
   children: ReactNode;
+  header?: ReactNode;
   title?: string;
   titleColor?: string;
-  isShowIcon?: boolean;
   isBack?: boolean;
   loader?: boolean;
   navigateLink?: string;
   isPrivate?: boolean;
   initialLoader?: boolean;
-  isLogo?: boolean;
   isShowLoader?: boolean;
-  Logo?: SVGElement;
 }
 
 const AppLayout = ({
   children,
+  header,
   title,
   titleColor,
-  isShowIcon,
   isBack,
   navigateLink,
-  isLogo = false,
-  Logo,
   isShowLoader = true,
-  route,
 }: AppLayoutProps) => {
   const { theme } = useThemeContext();
   const { loader, setLoader } = useAppContext();
@@ -55,14 +49,11 @@ const AppLayout = ({
         <KeyboardAvoidView keyboardVerticalOffset={80}>
           <AppContainer style={{ backgroundColor: theme.colors.mainBg }}>
             <Header
+              header={header}
               title={title}
               titleColor={titleColor}
-              isShowIcon={isShowIcon}
               isBack={isBack}
               navigateLink={navigateLink}
-              isLogo={isLogo}
-              Logo={Logo}
-              route={route}
             />
             <AppContent>{children}</AppContent>
           </AppContainer>

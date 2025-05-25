@@ -9,7 +9,7 @@ export const setKids = (kids: appTypes.Kid[]) => ({
   data: kids,
 });
 
-export const setCurrentKid = (kid: appTypes.Kid) => ({
+export const setCurrentKid = (kid: appTypes.Kid | null) => ({
   type: appTypes.SET_CURRENT_KID,
   data: kid,
 });
@@ -35,3 +35,27 @@ export const updateKid = (
   resolve,
   reject,
 });
+
+export const deleteKid = (
+  kid: appTypes.Kid,
+  resolve: (value: unknown) => void,
+  reject: (reason?: any) => void,
+) => ({
+  type: appTypes.DELETE_KID,
+  data: kid,
+  resolve,
+  reject,
+});
+
+export const deletePlaylist = (
+  playlist: any,
+  resolve: (value: unknown) => void,
+  reject: (reason?: any) => void,
+) => ({
+  type: appTypes.DELETE_PLAYLIST,
+  data: playlist,
+  resolve,
+  reject,
+});
+
+  

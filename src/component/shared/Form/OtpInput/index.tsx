@@ -8,9 +8,11 @@ interface OtpInputProps {
   onChange: (code: string, event: any) => void;
   pinCount?: number;
   name?: string;
+  bgColor?: string;
+  color?: string;
 }
 
-const OtpInput: React.FC<OtpInputProps> = ({ value = '', onChange, pinCount = 4 }) => {
+const OtpInput: React.FC<OtpInputProps> = ({ value = '', onChange, pinCount = 4, bgColor, color }) => {
   const { theme } = useThemeContext();
   const inputs = useRef<(TextInput | null)[]>([]);
   const codeArr = value.split('').concat(Array(pinCount).fill('')).slice(0, pinCount);
@@ -40,8 +42,8 @@ const OtpInput: React.FC<OtpInputProps> = ({ value = '', onChange, pinCount = 4 
           style={[
             styles.input,
             {
-              backgroundColor: theme.colors.input.background,
-              color: theme.colors.input.color,
+              backgroundColor: bgColor ? bgColor : theme.colors.input.background,
+              color: color ? color : theme.colors.input.color,
               borderRadius: 10,
               fontSize: 22,
               fontWeight: 'bold',

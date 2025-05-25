@@ -14,6 +14,11 @@ import {
   GradientBackground,
   UpdateButtonText,
 } from './styles';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateUserProfile } from '@/modules/Auth/store/authActions';
+import { RootState } from '@/store';
+import Typography from '@/component/shared/Typography';
+import toast from '@/utils/toast';
 
 interface UserProfile {
   id: number;
@@ -26,23 +31,22 @@ interface UserProfile {
 
 const EditProfile = () => {
   const { theme } = useThemeContext();
-  const { userProfileData, setUserProfileData } = useAuthContext();
+  const dispatch = useDispatch();
+  const currentUser = useSelector((state: RootState) => state.auth.user);
   const [isHidePassword, setIsHidePassword] = useState(true);
   const [loader, setLoader] = useState(false);
 
   const updateProfile = async (values: UserProfile) => {
     try {
-      setLoader(true);
-      // Implement profile update logic here
-      setUserProfileData(values);
-    } catch (error) {
-      console.error('Error updating profile:', error);
-    } finally {
-      setLoader(false);
+      setLoader(true)
+      await new Promise((resolve, reject) => {
+        dispatch(updateUserProfile({ ...currentUser, ...values }, resolve, reject))
+      })
+      setLoader(false)
+    } catch (error: any) {
+      toast.error(error?.error?.message || 'Something went wrong')
     }
   };
-
-  const profileData = userProfileData as UserProfile;
 
   return (
     <AppLayout title="Edit Profile" isBack>
@@ -50,12 +54,12 @@ const EditProfile = () => {
         <FormContainer>
           <Form
             initialValues={{
-              id: profileData?.id || 0,
-              firstName: profileData?.firstName || '',
-              lastName: profileData?.lastName || '',
-              username: profileData?.username || '',
-              email: profileData?.email || '',
-              passcode: profileData?.passcode || '',
+              id: currentUser?.id || 0,
+              firstName: currentUser?.firstName || '',
+              lastName: currentUser?.lastName || '',
+              username: currentUser?.username || '',
+              email: currentUser?.email || '',
+              passcode: currentUser?.passcode || '',
             }}
             validationSchema={Yup.object().shape({
               firstName: Yup.string().required('First name is required'),
@@ -75,7 +79,8 @@ const EditProfile = () => {
                 <StyledInput name="firstName" placeholder="First Name" />
                 <StyledInput name="lastName" placeholder="Last Name" />
                 <StyledInput name="email" placeholder="E-mail" />
-                <Stack direction="row" align='center' justify='space-between' style={{ width: "100%" }}>
+                <Stack direction="row" align='center' justify='space-between' style={{ width: "100%", marginTop: 8 }}>
+                  <Typography variant="h3" weight={600} color={theme.colors.text.primary}>Passcode</Typography>
                   <Form.Field.OtpInput name="passcode" pinCount={4} />
                 </Stack>
                 <StyledInput name="username" placeholder="Username" />

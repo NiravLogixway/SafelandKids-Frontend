@@ -26,8 +26,23 @@ export const addKid = (kid: any) => {
 };
 
 export const updateKid = (id: number, kid: any) => {
-  console.log(id, kid);
   return api(`childrens/${id}`, kid, 'put');
+};
+
+export const addChildPlaylist = (playlist: any) => {
+  return api(`playlists`, playlist, 'post');
+};
+
+export const getChildPlaylists = (kidId: number) => {
+  return api(`children/${kidId}/playlist`, null, 'get');
+};
+
+export const deleteKid = (id: number) => {
+  return api(`childrens/${id}`, null, 'delete');
+};
+
+export const deletePlaylist = (id: number) => {
+  return api(`playlists/${id}`, null, 'delete');
 };
 
 export async function fetchYoutubeOEmbed(

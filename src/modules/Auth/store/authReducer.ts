@@ -19,7 +19,6 @@ export default (state = initialState, action: AuthAction): AuthState => {
       return {...state, user: action.data, isAuthenticated: true};
 
     case authTypes.REMOVE_AUTH_USER:
-      console.log('REMOVE_AUTH_USER');
       return {...state, user: {}, isAuthenticated: false};
 
     case authTypes.SET_AUTH_LOADING:

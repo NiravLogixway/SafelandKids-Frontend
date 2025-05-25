@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import { useProfile } from '../../hooks/useProfile';
 import { ProfileContainer, MenuList, MenuItem, MenuText } from './styles';
 import { navigate } from '@/navigation/NavigationService';
 import DeleteModal from '../../common/DeleteModal';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '@/modules/Auth/store/authActions';
-
+import * as authActions from '@/modules/Auth/store/authActions';
+import { RootState } from '@/store';
+import toast from '@/utils/toast';
 
 const ProfileView = () => {
   const dispatch = useDispatch();
+  const currentUser = useSelector((state: RootState) => state.auth.user);
   const [isAccountDeleteModal, isSetAccountDeleteModal] = useState(false);
 
   const handleMenuAction = (menu: any) => {
@@ -23,8 +25,15 @@ const ProfileView = () => {
     dispatch(logout());
   }
 
-  const deleteAccount = () => {
-    dispatch(logout());
+  const deleteAccount = async () => {
+    try {
+      await new Promise((resolve, reject) => {
+        dispatch(authActions.updateUserProfile({ ...currentUser, blocked: true } as any, resolve, reject))
+      })
+      dispatch(logout());
+    } catch (error: any) {
+      toast.error(error?.error?.message || 'Something went wrong')
+    }
   }
 
   const toggleDeleteModal = () => {

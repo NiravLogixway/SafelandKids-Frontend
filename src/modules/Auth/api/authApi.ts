@@ -16,3 +16,7 @@ export const getRoles = () => {
 export const me = () => {
   return api('users/me', null, 'get');
 };
+
+export const updateProfile = (data: any) => {
+  return api(`users/${data.id}`, data, 'put');
+};

@@ -138,6 +138,7 @@ export const CombinedDefaultTheme = {
     info: 'rgba(27, 105, 253, 1)',
     background: {
       default: NavigationDefaultTheme.colors.background,
+      primary: '#ffffff',
       secondary: '#7A28FC',
       gradient: {
         primary: {
@@ -252,6 +253,7 @@ export const CombinedDarkTheme = {
     backdrop: 'rgba(51, 47, 55, 0.4)',
     background: {
       default: NavigationDarkTheme.colors.background,
+      primary: '#ffffff',
       gradient: {
         primary: {
           colors: ['rgba(28, 130, 109, 1)', 'rgba(40, 178, 151, 1)'],
