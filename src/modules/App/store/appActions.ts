@@ -58,6 +58,22 @@ export const addPlaylist = (
   reject,
 });
 
+export const getPlaylists = (
+  kidId: number,
+  resolve: (value: unknown) => void,
+  reject: (reason?: any) => void,
+) => ({
+  type: appTypes.GET_PLAYLISTS,
+  data: kidId,
+  resolve,
+  reject,
+});
+
+export const setPlaylists = (playlists: any[]) => ({
+  type: appTypes.SET_PLAYLISTS,
+  data: playlists,
+});
+
 export const updatePlaylist = (
   playlist: any,
   resolve: (value: unknown) => void,

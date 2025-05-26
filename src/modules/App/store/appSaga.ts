@@ -90,6 +90,22 @@ function* deleteKid(
   }
 }
 
+function* getPlaylists(
+  action: appTypes.GetPlaylistsAction,
+): Generator<any, void, any> {
+  try {
+    const response = yield call(appApi.getPlaylists as any, action.data);
+    if (Array.isArray(response)) {
+      yield put(appActions.setPlaylists(response));
+    } else {
+      action.reject(response);
+    }
+  } catch (error: any) {
+    action.reject(error);
+    console.error('Error in getPlaylists saga:', error);
+  }
+}
+
 function* addPlaylist(
   action: appTypes.AddChildPlaylistAction,
 ): Generator<any, void, any> {
@@ -114,13 +130,19 @@ function* updatePlaylist(
   action: appTypes.UpdatePlaylistAction,
 ): Generator<any, void, any> {
   try {
+    const playlists = yield select((state: RootState) => state.app.playlists);
     const data = action.data.data;
     const response = yield call(
       appApi.updatePlaylist as any,
       data.id,
       action.data,
     );
-    if (response?.data?.id) {
+    const {id, attributes} = response.data ?? {};
+    if (id) {
+      const updatedPlaylists = playlists.map((playlist: any) =>
+        playlist.id === id ? {id, ...attributes} : playlist,
+      );
+      yield put(appActions.setPlaylists(updatedPlaylists));
       action.resolve(response.data);
     } else {
       action.reject(response.data);
@@ -155,6 +177,7 @@ export function* watchSagas(): Generator<any, void, any> {
   yield takeLatest(appTypes.ADD_KID, addKid);
   yield takeLatest(appTypes.UPDATE_KID, updateKid);
   yield takeLatest(appTypes.DELETE_KID, deleteKid);
+  yield takeLatest(appTypes.GET_PLAYLISTS, getPlaylists);
   yield takeLatest(appTypes.ADD_PLAYLIST, addPlaylist);
   yield takeLatest(appTypes.UPDATE_PLAYLIST, updatePlaylist);
   yield takeLatest(appTypes.DELETE_PLAYLIST, deletePlaylist);

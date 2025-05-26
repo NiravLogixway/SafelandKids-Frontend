@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import KeyboardAvoidView from './KeyboardAvoidView';
 import Header from '../component/app/Header';
 import bg2Image from '@/assets/images/bg2Image.png';
+import { useTabContext } from '@/context/TabContext';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -31,6 +32,7 @@ const AppLayout = ({
   isShowLoader = true,
 }: AppLayoutProps) => {
   const { theme } = useThemeContext();
+  const { isTabBarVisible } = useTabContext();
   const { loader, setLoader } = useAppContext();
 
   useEffect(() => {
@@ -48,13 +50,13 @@ const AppLayout = ({
       >
         <KeyboardAvoidView keyboardVerticalOffset={80}>
           <AppContainer style={{ backgroundColor: theme.colors.mainBg }}>
-            <Header
+            {isTabBarVisible && <Header
               header={header}
               title={title}
               titleColor={titleColor}
               isBack={isBack}
               navigateLink={navigateLink}
-            />
+            />}
             <AppContent>{children}</AppContent>
           </AppContainer>
         </KeyboardAvoidView >

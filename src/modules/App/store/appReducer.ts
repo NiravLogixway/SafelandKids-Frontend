@@ -9,6 +9,7 @@ interface AppAction {
 const initialState: AppState = {
   kids: [],
   currentKid: null,
+  playlists: [],
 };
 
 export default (
@@ -25,6 +26,11 @@ export default (
       return {
         ...state,
         currentKid: payload.data,
+      };
+    case appTypes.SET_PLAYLISTS:
+      return {
+        ...state,
+        playlists: payload.data,
       };
     default:
       return state;

@@ -21,6 +21,8 @@ export const BackgroundImage = styled.ImageBackground(() => ({
 export const PlayerContainer = styled(Stack)(() => ({
   width: '100%',
   height: '100%',
+  justifyContent: 'center',
+  alignItems: 'center',
 }));
 
 export const OverlayHeader = styled.View(() => ({
@@ -34,7 +36,7 @@ export const OverlayHeader = styled.View(() => ({
   position: 'absolute',
   top: 0,
   left: 0,
-  zIndex: 10000,
+  zIndex: 1,
   shadowColor: '#000',
   shadowOffset: {width: 0, height: 2},
   shadowOpacity: 0.2,
@@ -68,11 +70,13 @@ export const Overlay = styled.View(() => ({
 }));
 
 export const ControlsContainer = styled.View(() => ({
-  width: '100%',
-  alignItems: 'center',
   position: 'absolute',
-  bottom: 60,
+  top: 0,
   left: 0,
+  right: 0,
+  bottom: 0,
+  justifyContent: 'center',
+  alignItems: 'center',
   zIndex: 3,
 }));
 
@@ -83,7 +87,6 @@ export const PlayPauseButton = styled.TouchableOpacity(() => ({
   backgroundColor: 'rgba(0,0,0,0.6)',
   justifyContent: 'center',
   alignItems: 'center',
-  marginBottom: 20,
 }));
 
 export const ProgressBarContainer = styled.View(() => ({
@@ -93,6 +96,7 @@ export const ProgressBarContainer = styled.View(() => ({
   borderRadius: 4,
   overflow: 'hidden',
   marginBottom: 8,
+  zIndex: 10000,
 }));
 
 export const ProgressBar = styled.View<{progress: number}>(({progress}) => ({

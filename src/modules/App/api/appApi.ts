@@ -37,7 +37,7 @@ export const addPlaylist = (playlist: any) => {
   return api(`playlists`, playlist, 'post');
 };
 
-export const getChildPlaylists = (kidId: number) => {
+export const getPlaylists = (kidId: number) => {
   return api(`children/${kidId}/playlist`, null, 'get');
 };
 

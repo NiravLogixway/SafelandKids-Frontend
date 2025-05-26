@@ -2,14 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { VideoPreviewCardContainer, VideoPreviewThumbnail, VideoPreviewTitle, VideoPreviewTitleText } from './styles'
 import { ScrollView } from 'react-native-gesture-handler'
 import { useThemeContext } from '@/context/ThemeContext';
-import { getChildPlaylists } from '../../api/appApi';
 import AppLayout from '@/layouts/AppLayout';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { navigate } from '@/navigation/NavigationService';
 import { TouchableOpacity } from 'react-native';
 import CustomHeader from '../../common/CustomHeader';
-import Typography from '@/component/shared/Typography';
+import * as appActions from '@/modules/App/store/appActions';
 
 export interface VideoProps {
   id: number;
@@ -51,24 +50,26 @@ const ChildPlaylist = (props: any) => {
   const { theme } = useThemeContext()
   const dispatch = useDispatch()
   const currentKid = useSelector((state: RootState) => state.app.currentKid);
-  const [videos, setVideos] = useState<VideoProps[]>([]);
-  const [loading, setLoading] = useState(false)
+  const playlists = useSelector((state: RootState) => state.app.playlists);
+  const [loading, setLoading] = useState(false);
 
-  const childName = `${kid.firstName ?? ""} ${kid.lastName ?? ""}`.trim() ?? "";
+  const getChildPlaylists = async () => {
+    try {
+      setLoading(true)
+      await new Promise((resolve, reject) => {
+        return dispatch(appActions.getPlaylists(kid.id, resolve, reject))
+      })
+      setLoading(false)
+    } catch (error) {
+      setLoading(false)
+      console.error(error)
+    }
+
+  }
 
   useEffect(() => {
     if (kid.id) {
-      setLoading(true);
-      getChildPlaylists(kid.id).then(res => {
-        if (res.length > 0) {
-          setVideos(res);
-        }
-      }).finally(() => {
-        setLoading(false);
-      });
-    }
-    return () => {
-      setVideos([]);
+      getChildPlaylists()
     }
   }, [kid.id]);
 
@@ -81,7 +82,7 @@ const ChildPlaylist = (props: any) => {
   return (
     <AppLayout header={<CustomHeader />}>
       <ScrollView contentContainerStyle={{ flexGrow: 1, padding: theme.spacing.lg }}>
-        {videos.map((video, idx) => (
+        {playlists.map((video, idx) => (
           <VideoPreviewCard
             key={idx}
             title={video.name}

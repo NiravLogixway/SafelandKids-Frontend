@@ -11,6 +11,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { navigationRef } from './navigation/NavigationService';
 import ThemeContext, { useThemeContext } from './context/ThemeContext';
 import ToastComponent from './component/shared/Toast';
+import TabContextProvider from './context/TabContext';
 
 const StyledGestureHandler = styled(GestureHandlerRootView)`
   flex: 1;
@@ -27,7 +28,9 @@ const AppContainer = (): React.ReactElement => {
         <StatusBar animated={true} backgroundColor="#ffffff" barStyle="dark-content" />
         <StyledGestureHandler>
           <NavigationContainer ref={navigationRef} theme={theme}>
-            <Navigator />
+            <TabContextProvider>
+              <Navigator />
+            </TabContextProvider>
             <ToastComponent />
           </NavigationContainer>
         </StyledGestureHandler>
