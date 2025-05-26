@@ -29,7 +29,11 @@ export const updateKid = (id: number, kid: any) => {
   return api(`childrens/${id}`, kid, 'put');
 };
 
-export const addChildPlaylist = (playlist: any) => {
+export const deleteKid = (id: number) => {
+  return api(`childrens/${id}`, null, 'delete');
+};
+
+export const addPlaylist = (playlist: any) => {
   return api(`playlists`, playlist, 'post');
 };
 
@@ -37,8 +41,8 @@ export const getChildPlaylists = (kidId: number) => {
   return api(`children/${kidId}/playlist`, null, 'get');
 };
 
-export const deleteKid = (id: number) => {
-  return api(`childrens/${id}`, null, 'delete');
+export const updatePlaylist = (playlistId: number, playlist: any) => {
+  return api(`playlists/${playlistId}`, playlist, 'put');
 };
 
 export const deletePlaylist = (id: number) => {

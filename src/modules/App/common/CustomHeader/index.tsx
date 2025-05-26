@@ -24,6 +24,11 @@ const CustomHeader = (props: any) => {
         style={{ marginRight: 8 }}
         onChange={handleToggle}
         theme={theme}
+        trackColor={{
+          true: theme.colors.secondary,
+          false: theme.colors.secondary,
+        }}
+        color={theme.colors.onSecondary}
       />
       <Typography variant="h2" weight={600} color={theme.colors.text.textPrimary}>{childName}</Typography>
     </>

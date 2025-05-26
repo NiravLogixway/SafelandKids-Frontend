@@ -90,11 +90,11 @@ function* deleteKid(
   }
 }
 
-function* addChildPlaylist(
+function* addPlaylist(
   action: appTypes.AddChildPlaylistAction,
 ): Generator<any, void, any> {
   try {
-    const response = yield call(appApi.addChildPlaylist as any, action.data);
+    const response = yield call(appApi.addPlaylist as any, action.data);
     if (response?.success) {
       toast.success('Playlist added successfully');
       yield call(getKids);
@@ -106,7 +106,29 @@ function* addChildPlaylist(
   } catch (error: any) {
     toast.error(error.error?.message || 'Failed to add child playlist');
     action.reject(error);
-    console.error('Error in addChildPlaylist saga:', error);
+    console.error('Error in addPlaylist saga:', error);
+  }
+}
+
+function* updatePlaylist(
+  action: appTypes.UpdatePlaylistAction,
+): Generator<any, void, any> {
+  try {
+    const data = action.data.data;
+    const response = yield call(
+      appApi.updatePlaylist as any,
+      data.id,
+      action.data,
+    );
+    if (response?.data?.id) {
+      action.resolve(response.data);
+    } else {
+      action.reject(response.data);
+    }
+  } catch (error: any) {
+    toast.error(error.error?.message || 'Failed to update playlist');
+    action.reject(error);
+    console.error('Error in updatePlaylist saga:', error);
   }
 }
 
@@ -133,7 +155,8 @@ export function* watchSagas(): Generator<any, void, any> {
   yield takeLatest(appTypes.ADD_KID, addKid);
   yield takeLatest(appTypes.UPDATE_KID, updateKid);
   yield takeLatest(appTypes.DELETE_KID, deleteKid);
-  yield takeLatest(appTypes.ADD_CHILD_PLAYLIST, addChildPlaylist);
+  yield takeLatest(appTypes.ADD_PLAYLIST, addPlaylist);
+  yield takeLatest(appTypes.UPDATE_PLAYLIST, updatePlaylist);
   yield takeLatest(appTypes.DELETE_PLAYLIST, deletePlaylist);
 }
 

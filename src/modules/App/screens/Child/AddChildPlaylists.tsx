@@ -7,7 +7,7 @@ import Menu from '@/component/shared/Menu';
 import { Image, Pressable, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { fetchYoutubeOEmbed, addChildPlaylist, YoutubeOEmbedResponse, getChildPlaylists } from '@/modules/App/api/appApi';
+import { fetchYoutubeOEmbed, addPlaylist, YoutubeOEmbedResponse, getChildPlaylists } from '@/modules/App/api/appApi';
 import Clipboard from '@react-native-clipboard/clipboard';
 import {
   StyledGradientButton,
@@ -327,7 +327,7 @@ const AddChildPlaylists = (props: any) => {
     setLoading(true);
     try {
       await new Promise((resolve, reject) => {
-        dispatch(appActions.addChildPlaylist(videos, resolve, reject))
+        dispatch(appActions.addPlaylist(videos, resolve, reject))
       })
       toast.success('Playlists added successfully');
       navigateToNestedScreen('Home', 'ChildList', { kid });

@@ -16,13 +16,13 @@ import ChildForm from '@/modules/App/screens/Child/ChildForm';
 import EditProfile from '@/modules/App/screens/Profile/EditProfile';
 import AddChildPlaylists from '@/modules/App/screens/Child/AddChildPlaylists';
 import ChildVideoPlayer from '@/modules/App/screens/Child/ChildVideoPlayer';
-import ChildPlaylist from '@/modules/App/screens/Child/ChildPlaylist';
+import ChildPlaylist, { VideoProps } from '@/modules/App/screens/Child/ChildPlaylist';
 import Passcode from '@/modules/App/screens/Passcode';
 import { Kid } from '@/modules/App/store/appTypes';
 
 // Tab/Stack Types
 export type MainTab = { Home: undefined; Child: undefined; Profile: undefined; };
-export type HomeStack = { ChildList: undefined; ChildVideoPlayer: { kid: Kid, videoId: string }; ChildVideoPlaylist: { kid: Kid }; Passcode: { kid: Kid } };
+export type HomeStack = { ChildList: undefined; ChildVideoPlayer: { kid: Kid, video: VideoProps }; ChildVideoPlaylist: { kid: Kid }; Passcode: { kid: Kid } };
 export type ChildStack = { ChildForm: { mode?: 'add' | 'edit'; kid?: Kid }; ChildPlaylist: undefined; };
 export type ProfileStack = { Profile: undefined; EditProfile: undefined; };
 
@@ -35,7 +35,7 @@ const HomeNav = () => (
   <HomeStack.Navigator screenOptions={{ headerShown: false }}>
     <HomeStack.Screen name="ChildList" component={Home} />
     <HomeStack.Screen name="ChildVideoPlaylist" component={ChildPlaylist} initialParams={{ kid: undefined }} />
-    <HomeStack.Screen name="ChildVideoPlayer" component={ChildVideoPlayer} initialParams={{ kid: undefined, videoId: undefined }} />
+    <HomeStack.Screen name="ChildVideoPlayer" component={ChildVideoPlayer} initialParams={{ kid: undefined, video: undefined }} />
     <HomeStack.Screen name="Passcode" component={Passcode} initialParams={{ kid: undefined }} />
   </HomeStack.Navigator>
 );

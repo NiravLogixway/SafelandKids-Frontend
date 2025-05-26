@@ -81,6 +81,11 @@ const Home = () => {
             }}
             style={{ marginRight: 16 }}
             theme={theme}
+            trackColor={{
+              true: theme.colors.secondary,
+              false: theme.colors.secondary,
+            }}
+            color={theme.colors.onSecondary}
           />
         </Pressable>
         <Typography variant="body1" weight={500}>{item.firstName} {item.lastName}</Typography>

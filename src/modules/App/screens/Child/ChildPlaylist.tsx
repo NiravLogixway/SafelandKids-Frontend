@@ -11,7 +11,7 @@ import { TouchableOpacity } from 'react-native';
 import CustomHeader from '../../common/CustomHeader';
 import Typography from '@/component/shared/Typography';
 
-interface VideoProps {
+export interface VideoProps {
   id: number;
   name: string;
   url: string;
@@ -72,16 +72,9 @@ const ChildPlaylist = (props: any) => {
     }
   }, [kid.id]);
 
-  const getYoutubeVideoId = (url: string) => {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : null;
-  }
-
   const handleVideoPress = (video: VideoProps) => {
-    const videoId = getYoutubeVideoId(video.url);
-    if (videoId) {
-      navigate("ChildVideoPlayer", { kid: currentKid, videoId })
+    if (video) {
+      navigate("ChildVideoPlayer", { kid: currentKid, video })
     }
   }
 
