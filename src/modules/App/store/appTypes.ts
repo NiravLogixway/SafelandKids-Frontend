@@ -4,6 +4,7 @@ export const SET_CURRENT_KID = 'SET_CURRENT_KID';
 export const ADD_KID = 'ADD_KID';
 export const UPDATE_KID = 'UPDATE_KID';
 export const DELETE_KID = 'DELETE_KID';
+export const ADD_CHILD_PLAYLIST = 'ADD_CHILD_PLAYLIST';
 export const DELETE_PLAYLIST = 'DELETE_PLAYLIST';
 
 export interface Kid {
@@ -12,6 +13,7 @@ export interface Kid {
   lastName: string;
   age: number;
   enabled?: boolean;
+  playlists?: any[];
 }
 
 export interface AppState {
@@ -36,6 +38,13 @@ export interface UpdateKidAction {
 export interface DeleteKidAction {
   type: typeof DELETE_KID;
   data: Kid;
+  resolve: (value: unknown) => void;
+  reject: (reason?: any) => void;
+}
+
+export interface AddChildPlaylistAction {
+  type: typeof ADD_CHILD_PLAYLIST;
+  data: any[];
   resolve: (value: unknown) => void;
   reject: (reason?: any) => void;
 }

@@ -47,6 +47,17 @@ export const deleteKid = (
   reject,
 });
 
+export const addChildPlaylist = (
+  videos: any[],
+  resolve: (value: unknown) => void,
+  reject: (reason?: any) => void,
+) => ({
+  type: appTypes.ADD_CHILD_PLAYLIST,
+  data: videos,
+  resolve,
+  reject,
+});
+
 export const deletePlaylist = (
   playlist: any,
   resolve: (value: unknown) => void,
@@ -57,5 +68,3 @@ export const deletePlaylist = (
   resolve,
   reject,
 });
-
-  

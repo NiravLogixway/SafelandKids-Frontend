@@ -17,7 +17,7 @@ function* getKids(): Generator<any, void, any> {
   try {
     const user = (yield select(getUser)) as User;
     const response = yield call(appApi.getKidsList, user.id);
-    if (response?.length) {
+    if (Array.isArray(response)) {
       yield put(appActions.setKids(response));
     }
   } catch (error) {
@@ -46,8 +46,10 @@ function* addKid(action: appTypes.AddKidAction): Generator<any, void, any> {
   } catch (error: any) {
     toast.error(error.error?.message || 'Failed to add child');
     console.error('Error in addKid saga:', error);
+    action.reject(error);
   }
 }
+
 function* updateKid(
   action: appTypes.UpdateKidAction,
 ): Generator<any, void, any> {
@@ -64,6 +66,7 @@ function* updateKid(
     }
   } catch (error: any) {
     toast.error(error.error?.message || 'Failed to update child');
+    action.reject(error);
     console.error('Error in updateKid saga:', error);
   }
 }
@@ -75,7 +78,6 @@ function* deleteKid(
     const response = yield call(appApi.deleteKid as any, action.data.id);
     if (response?.data?.id) {
       yield call(getKids);
-
       toast.success('Child deleted successfully');
       action.resolve(response.data);
     } else {
@@ -83,7 +85,28 @@ function* deleteKid(
     }
   } catch (error: any) {
     toast.error(error.error?.message || 'Failed to delete child');
+    action.reject(error);
     console.error('Error in deleteKid saga:', error);
+  }
+}
+
+function* addChildPlaylist(
+  action: appTypes.AddChildPlaylistAction,
+): Generator<any, void, any> {
+  try {
+    const response = yield call(appApi.addChildPlaylist as any, action.data);
+    if (response?.success) {
+      toast.success('Playlist added successfully');
+      yield call(getKids);
+      navigate('Home', {});
+      action.resolve(response);
+    } else {
+      action.reject(response);
+    }
+  } catch (error: any) {
+    toast.error(error.error?.message || 'Failed to add child playlist');
+    action.reject(error);
+    console.error('Error in addChildPlaylist saga:', error);
   }
 }
 
@@ -91,7 +114,7 @@ function* deletePlaylist(
   action: appTypes.DeletePlaylistAction,
 ): Generator<any, void, any> {
   try {
-    const response = yield call(appApi.deletePlaylist as any, action.data.id);
+    const response = yield call(appApi.deletePlaylist as any, action.data);
     if (response?.data?.id) {
       toast.success('Playlist deleted successfully');
       action.resolve(response.data);
@@ -100,6 +123,7 @@ function* deletePlaylist(
     }
   } catch (error: any) {
     toast.error(error.error?.message || 'Failed to delete playlist');
+    action.reject(error);
     console.error('Error in deletePlaylist saga:', error);
   }
 }
@@ -109,6 +133,7 @@ export function* watchSagas(): Generator<any, void, any> {
   yield takeLatest(appTypes.ADD_KID, addKid);
   yield takeLatest(appTypes.UPDATE_KID, updateKid);
   yield takeLatest(appTypes.DELETE_KID, deleteKid);
+  yield takeLatest(appTypes.ADD_CHILD_PLAYLIST, addChildPlaylist);
   yield takeLatest(appTypes.DELETE_PLAYLIST, deletePlaylist);
 }
 

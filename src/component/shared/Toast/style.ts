@@ -3,8 +3,14 @@ import styled, {css} from 'styled-components/native';
 import {Snackbar} from 'react-native-paper';
 import {theme} from '../../../config/theme';
 
-export const StyledToast = styled(Snackbar).attrs({})`
-  ${(props: any) => variants[props.type]}
+export type ToastType = 'success' | 'warning' | 'info' | 'danger';
+
+interface ToastProps {
+  type: ToastType;
+}
+
+export const StyledToast = styled(Snackbar).attrs({})<ToastProps>`
+  ${props => variants[props.type]}
 `;
 
 const success = css`

@@ -70,6 +70,13 @@ const fonts = {
     lineHeight: 24,
     letterSpacing: 0.5,
   },
+  bodyMedium: {
+    fontFamily: 'OpenSans-Regular',
+    fontWeight: 'normal',
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.25,
+  },
   labelLarge: {
     fontFamily: 'OpenSans-Bold',
     fontWeight: '500',

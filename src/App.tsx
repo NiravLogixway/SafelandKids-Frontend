@@ -10,6 +10,7 @@ import Navigator from '@/navigation';
 import { NavigationContainer } from '@react-navigation/native';
 import { navigationRef } from './navigation/NavigationService';
 import ThemeContext, { useThemeContext } from './context/ThemeContext';
+import ToastComponent from './component/shared/Toast';
 
 const StyledGestureHandler = styled(GestureHandlerRootView)`
   flex: 1;
@@ -27,6 +28,7 @@ const AppContainer = (): React.ReactElement => {
         <StyledGestureHandler>
           <NavigationContainer ref={navigationRef} theme={theme}>
             <Navigator />
+            <ToastComponent />
           </NavigationContainer>
         </StyledGestureHandler>
       </ThemeProvider>

@@ -14,6 +14,7 @@ import * as appActions from '../../store/appActions';
 import { RootState } from '@/store';
 import { Kid } from '../../store/appTypes';
 import { setItem } from '@/utils/localstorage';
+import toast from '@/utils/toast';
 
 const menuItems = [
   { label: 'Edit', value: 'edit', id: 1 },
@@ -32,10 +33,12 @@ const Home = () => {
   }, [dispatch]);
 
   const handleToggle = (kid: Kid) => {
-    if (kid) {
+    if (kid && kid.playlists && kid.playlists.length > 0) {
       setItem('CURRENT_KID', JSON.stringify(kid));
       dispatch(appActions.setCurrentKid(kid));
       navigate('ChildVideoPlaylist', { kid });
+    } else {
+      toast.info('No videos found for this kid. Please add at least one video to get started.');
     }
   };
 

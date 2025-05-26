@@ -188,7 +188,7 @@ const AddChildPlaylists = (props: any) => {
 
   const handleAddMore = () => {
     const lastVideo = videos[videos.length - 1];
-    if (!lastVideo || !lastVideo.url.trim()) {
+    if (lastVideo && !lastVideo.url.trim()) {
       setErrors(prev => ({ ...prev, [videos.length - 1]: 'Paste a youtube URL here' }));
       return;
     }
@@ -294,12 +294,20 @@ const AddChildPlaylists = (props: any) => {
   }
 
   const handleDelete = async (idx: number) => {
-    setVideos(videos => videos.filter((_, i) => i !== idx).map((item, i) => ({ ...item, order: i + 1 })));
-    const playlistId = videos[idx].id;
-    if (playlistId) {
-      await new Promise((resolve, reject) => {
-        dispatch(appActions.deletePlaylist(playlistId, resolve, reject))
-      })
+    try {
+      const filteredVideos = videos.filter((_, i) => i !== idx).map((item, i) => ({ ...item, order: i + 1 }));
+      setVideos(filteredVideos);
+      const playlistId = videos[idx].id;
+      if (playlistId) {
+        await new Promise((resolve, reject) => {
+          dispatch(appActions.deletePlaylist(playlistId, resolve, reject))
+        })
+      }
+      if (filteredVideos.length === 0) {
+        setMode('input');
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -318,7 +326,9 @@ const AddChildPlaylists = (props: any) => {
   const handleFinish = async () => {
     setLoading(true);
     try {
-      await addChildPlaylist(videos);
+      await new Promise((resolve, reject) => {
+        dispatch(appActions.addChildPlaylist(videos, resolve, reject))
+      })
       toast.success('Playlists added successfully');
       navigateToNestedScreen('Home', 'ChildList', { kid });
     } catch (e) {
