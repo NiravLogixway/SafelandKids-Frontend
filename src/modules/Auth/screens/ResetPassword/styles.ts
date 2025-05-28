@@ -5,7 +5,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import Typography from '@/component/shared/Typography';
 import Button from '@/component/shared/Button';
 
-export const ForgetPasswordContainer = styled(Box)(({theme}) => ({
+export const ResetPasswordContainer = styled(Box)(({theme}) => ({
   flex: 1,
   paddingHorizontal: theme.spacing.lg,
   paddingTop: theme.spacing.xl,
@@ -17,9 +17,10 @@ export const StyledInput = styled(Form.Field.Input)(({theme}) => ({
   color: theme.colors.inputText,
   paddingHorizontal: theme.spacing.sm,
   borderRadius: theme.borderRadius.md,
+  marginTop: theme.spacing.md,
 }));
 
-export const SubmitButtonContainer = styled(Button).attrs(({theme}) => ({
+export const ResetButtonContainer = styled(Button).attrs(({theme}) => ({
   mode: 'contained',
   textColor: theme.colors.text.primary,
   style: {
@@ -50,15 +51,7 @@ export const GradientBackground = styled(LinearGradient).attrs(({theme}) => ({
   borderRadius: theme.borderRadius.md,
 }));
 
-export const SubmitButtonText = styled(Typography)(({theme}) => ({
+export const ResetButtonText = styled(Typography)(({theme}) => ({
   fontWeight: 600,
   color: theme.colors.text.primary,
-}));
-
-export const ForgetPasswordText = styled(Typography)(({theme}) => ({
-  color: theme.colors.text.primary,
-  fontSize: 14,
-  fontFamily: theme.fonts.FONT_REGULAR,
-  fontWeight: 600,
-  marginBottom: theme.spacing.md,
 }));

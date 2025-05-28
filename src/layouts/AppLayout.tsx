@@ -2,12 +2,13 @@ import React, { ReactNode, useEffect } from 'react';
 import { AppContainer, AppContent } from './style';
 import { useThemeContext } from '../context/ThemeContext';
 import { useAppContext } from '../context/AppContext';
-import { ImageBackground } from 'react-native';
+import { ImageBackground, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import KeyboardAvoidView from './KeyboardAvoidView';
 import Header from '../component/app/Header';
 import bg2Image from '@/assets/images/bg2Image.png';
 import { useTabContext } from '@/context/TabContext';
+import Stack from '@/component/shared/Stack';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -42,27 +43,29 @@ const AppLayout = ({
   }, [isShowLoader, setLoader]);
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
-      <ImageBackground
-        source={bg2Image}
-        style={{ flex: 1 }}
-        resizeMode="cover"
-      >
-        <KeyboardAvoidView keyboardVerticalOffset={80}>
-          <AppContainer style={{ backgroundColor: theme.colors.mainBg }}>
-            {isTabBarVisible && <Header
-              header={header}
-              title={title}
-              titleColor={titleColor}
-              isBack={isBack}
-              navigateLink={navigateLink}
-            />}
-            <AppContent>{children}</AppContent>
-          </AppContainer>
-        </KeyboardAvoidView >
-      </ImageBackground>
-    </SafeAreaView>
-
+    <Stack direction="column" style={{ flex: 1, height: '100%', width: '100%', position: 'relative' }}>
+      <View style={{ flex: 1, backgroundColor: theme.colors.mainBg, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}></View>
+      <SafeAreaView style={{ flex: 1, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} edges={['top']}>
+        <ImageBackground
+          source={bg2Image}
+          style={{ flex: 1 }}
+          resizeMode="cover"
+        >
+          <KeyboardAvoidView keyboardVerticalOffset={80}>
+            <AppContainer>
+              {isTabBarVisible && <Header
+                header={header}
+                title={title}
+                titleColor={titleColor}
+                isBack={isBack}
+                navigateLink={navigateLink}
+              />}
+              <AppContent>{children}</AppContent>
+            </AppContainer>
+          </KeyboardAvoidView >
+        </ImageBackground>
+      </SafeAreaView>
+    </Stack>
   );
 };
 

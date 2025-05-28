@@ -7,6 +7,9 @@ import InternetAccess from '@/component/app/InternetAccess';
 import AppNavigator from './AppStack';
 import AuthNavigator from './AuthStack';
 import AuthLoader from '@/modules/Auth/screens/AuthLoader';
+import { NavigationContainer } from '@react-navigation/native';
+import { navigationRef } from './NavigationService';
+import { linking } from './linking';
 
 const App: React.FC = () => {
   const [isInternetConnected, setIsInternetConnected] = useState(true);
@@ -32,7 +35,15 @@ const App: React.FC = () => {
     return <AuthLoader />;
   }
 
-  return isLogin ? <AppNavigator /> : <AuthNavigator />;
+  return (
+    <NavigationContainer
+      ref={navigationRef}
+      linking={linking}
+      fallback={<AuthLoader />}
+    >
+      {isLogin ? <AppNavigator /> : <AuthNavigator />}
+    </NavigationContainer>
+  );
 };
 
 export default App;

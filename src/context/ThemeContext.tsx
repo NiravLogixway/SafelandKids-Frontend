@@ -5,24 +5,24 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import {CombinedDarkTheme, CombinedDefaultTheme} from '../config/theme';
-import {Appearance} from 'react-native';
+import { CombinedDarkTheme, CombinedDefaultTheme } from '../config/theme';
+import { Appearance } from 'react-native';
 
 const ThemeCustomizationContext = createContext({
   theme: CombinedDefaultTheme as any,
-  toggleTheme: () => {},
+  toggleTheme: () => { },
   isThemeDark: false,
 });
 
-const ThemeContext = ({children}: any) => {
+const ThemeContext = ({ children }: any) => {
   const colorScheme = Appearance.getColorScheme();
   const [isThemeDark, setIsThemeDark] = useState(false);
 
   let theme = isThemeDark ? CombinedDarkTheme : CombinedDefaultTheme;
 
-  useEffect(() => {
-    setIsThemeDark(colorScheme === 'dark');
-  }, [colorScheme]);
+  // useEffect(() => {
+  //   setIsThemeDark(colorScheme === 'dark');
+  // }, [colorScheme]);
 
   const toggleTheme = useCallback(
     () => setIsThemeDark(!isThemeDark),
@@ -31,7 +31,7 @@ const ThemeContext = ({children}: any) => {
 
   return (
     <ThemeCustomizationContext.Provider
-      value={{toggleTheme, theme, isThemeDark}}>
+      value={{ toggleTheme, theme, isThemeDark }}>
       {children}
     </ThemeCustomizationContext.Provider>
   );

@@ -20,6 +20,7 @@ import ChildPlaylist, { VideoProps } from '@/modules/App/screens/Child/ChildPlay
 import Passcode from '@/modules/App/screens/Passcode';
 import { Kid } from '@/modules/App/store/appTypes';
 import { useTabContext } from '@/context/TabContext';
+import { useThemeContext } from '@/context/ThemeContext';
 
 // Tab/Stack Types
 export type MainTab = { Home: undefined; Child: undefined; Profile: undefined; };
@@ -68,7 +69,7 @@ const AppNavigator: React.FC<{ screenOptions?: NativeStackNavigationOptions }> =
   const dispatch = useDispatch();
   const { isTabBarVisible } = useTabContext();
   const { handleTabPress, isChildMode } = useTabNavigationGuard();
-
+  const { theme } = useThemeContext();
   useEffect(() => {
     getItem('CURRENT_KID').then((currentKid) => {
       if (currentKid) {
@@ -94,9 +95,11 @@ const AppNavigator: React.FC<{ screenOptions?: NativeStackNavigationOptions }> =
         tabBarStyle: {
           borderTopWidth: 0,
           elevation: 0,
-          height: 60,
-          marginBlock: 10,
+          height: 70,
+          paddingBottom: 10,
+          paddingTop: 10,
           display: isTabBarVisible ? 'flex' : 'none',
+          backgroundColor: theme.colors.bottomNavigationBg,
         },
         tabBarLabelStyle: { display: 'none' },
         headerShown: false,

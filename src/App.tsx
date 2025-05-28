@@ -7,8 +7,6 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import styled, { ThemeProvider } from 'styled-components/native';
 import store from '@/store';
 import Navigator from '@/navigation';
-import { NavigationContainer } from '@react-navigation/native';
-import { navigationRef } from './navigation/NavigationService';
 import ThemeContext, { useThemeContext } from './context/ThemeContext';
 import ToastComponent from './component/shared/Toast';
 import TabContextProvider from './context/TabContext';
@@ -27,12 +25,10 @@ const AppContainer = (): React.ReactElement => {
       <ThemeProvider theme={theme}>
         <StatusBar animated={true} backgroundColor="#ffffff" barStyle="dark-content" />
         <StyledGestureHandler>
-          <NavigationContainer ref={navigationRef} theme={theme}>
-            <TabContextProvider>
-              <Navigator />
-            </TabContextProvider>
-            <ToastComponent />
-          </NavigationContainer>
+          <TabContextProvider>
+            <Navigator />
+          </TabContextProvider>
+          <ToastComponent />
         </StyledGestureHandler>
       </ThemeProvider>
     </PaperProvider>

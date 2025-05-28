@@ -3,10 +3,10 @@ import Stack from '@/component/shared/Stack';
 import Box from '@/component/shared/Box';
 import { useSelector } from 'react-redux';
 import { TouchableOpacity } from 'react-native';
-import { theme } from '@/config/theme';
 import Typography from '@/component/shared/Typography';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { navigate, goBackWithDispatch } from '@/navigation/NavigationService';
+import { useThemeContext } from '@/context/ThemeContext';
 
 interface HeaderProps {
   title?: string;
@@ -23,8 +23,8 @@ const Header = ({
   titleColor,
   navigateLink,
 }: HeaderProps) => {
+  const { theme } = useThemeContext();
   const user = useSelector((state: any) => state.auth.user);
-
   const handleBackPress = () => {
     if (navigateLink) {
       navigate(navigateLink, {});
@@ -32,9 +32,9 @@ const Header = ({
       goBackWithDispatch();
     }
   };
-
+  console.log(theme.colors.headerBg, "headerBg")
   return (
-    <Box py={3} px={3} style={{ backgroundColor: theme.colors.onPrimary }}>
+    <Box py={3} px={3} style={{ backgroundColor: theme.colors.headerBg }}>
       <Stack direction="row" align="center" justify="space-between" gap={1}>
         {<Stack direction="row" align="center" gap={1}>
           {isBack && (

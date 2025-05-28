@@ -20,3 +20,11 @@ export const me = () => {
 export const updateProfile = (data: any) => {
   return api(`users/${data.id}`, data, 'put');
 };
+
+export const forgetPassword = (email: string) => {
+  return api('auth/forgot-password', {email}, 'post');
+};
+
+export const resetPassword = (data: any) => {
+  return api('auth/reset-password', data, 'post');
+};

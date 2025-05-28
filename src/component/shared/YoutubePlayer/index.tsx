@@ -100,7 +100,11 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ videoId, videoTitle, vid
         }
       }, 1000);
     }
-    return () => interval && clearInterval(interval);
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
   }, [playing]);
 
 

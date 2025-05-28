@@ -97,6 +97,7 @@ function* getPlaylists(
     const response = yield call(appApi.getPlaylists as any, action.data);
     if (Array.isArray(response)) {
       yield put(appActions.setPlaylists(response));
+      action.resolve(response);
     } else {
       action.reject(response);
     }

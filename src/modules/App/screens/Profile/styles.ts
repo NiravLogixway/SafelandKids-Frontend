@@ -60,6 +60,7 @@ export const UpdateButtonContainer = styled(Button).attrs(({theme}) => ({
     alignItems: 'center',
   },
 }))(({theme}) => ({
+  backgroundColor: 'transparent',
   borderRadius: theme.borderRadius.md,
 }));
 

@@ -59,8 +59,6 @@ function* getUserProfille(): Generator<any, void, any> {
     if (token) {
       const profile = yield call(authApi.me);
       yield put(authActions.setAuthUser(profile));
-    } else {
-      yield call(handleLogout);
     }
   } catch (error: any) {
     yield call(handleLogout);
@@ -104,9 +102,50 @@ function* handleLogout(): Generator<any, void, any> {
   }
 }
 
+function* handleForgetPassword({
+  email,
+  resolve,
+  reject,
+}: authTypes.ForgetPasswordPayload): Generator<any, void, any> {
+  try {
+    const res = yield call(authApi.forgetPassword, email);
+    if (res.ok) {
+      toast.success(res.message);
+      resolve(true);
+    } else {
+      reject(res.message);
+    }
+  } catch (error: any) {
+    toast.error(error.error?.message || 'Something went wrong!!');
+    reject(error);
+  }
+}
+
+function* handleResetPassword({
+  data,
+  resolve,
+  reject,
+}: authTypes.ResetPasswordPayload): Generator<any, void, any> {
+  try {
+    const res = yield call(authApi.resetPassword, data);
+    if (res.ok) {
+      toast.success('Password reset successfully');
+      resolve(true);
+      navigate('Login', {});
+    } else {
+      reject(res.message);
+    }
+  } catch (error: any) {
+    toast.error(error.error?.message || 'Something went wrong!!');
+    reject(error);
+  }
+}
+
 export function* watchSagas(): Generator<any, void, any> {
   yield takeLatest(authTypes.LOGIN as any, handleLogin);
   yield takeLatest(authTypes.REGISTER as any, handleRegister);
+  yield takeLatest(authTypes.FORGET_PASSWORD as any, handleForgetPassword);
+  yield takeLatest(authTypes.RESET_PASSWORD as any, handleResetPassword);
   yield takeLatest(authTypes.USER_PROFILE as any, getUserProfille);
   yield takeLatest(authTypes.UPDATE_USER_PROFILE as any, updateUserProfile);
   yield takeLatest(authTypes.LOGOUT as any, handleLogout);

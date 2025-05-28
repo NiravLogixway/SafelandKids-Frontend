@@ -1,5 +1,17 @@
 import * as authTypes from './authTypes';
-import {LoginPayload, RegisterPayload, UpdateUserProfilePayload} from './authTypes';
+import {
+  ForgetPasswordPayload,
+  LoginPayload,
+  RegisterPayload,
+  ResetPasswordPayload,
+  UpdateUserProfilePayload,
+} from './authTypes';
+import {
+  login as loginApi,
+  register as registerApi,
+  forgetPassword as forgetPasswordApi,
+  resetPassword as resetPasswordApi,
+} from '../api/authApi';
 
 export const login = (
   data: LoginPayload['data'],
@@ -45,6 +57,28 @@ export const updateUserProfile = (
   reject: UpdateUserProfilePayload['reject'],
 ) => ({
   type: authTypes.UPDATE_USER_PROFILE,
+  data,
+  resolve,
+  reject,
+});
+
+export const forgetPassword = (
+  email: ForgetPasswordPayload['email'],
+  resolve: ForgetPasswordPayload['resolve'],
+  reject: ForgetPasswordPayload['reject'],
+) => ({
+  type: authTypes.FORGET_PASSWORD,
+  email,
+  resolve,
+  reject,
+});
+
+export const resetPassword = (
+  data: ResetPasswordPayload['data'],
+  resolve: (value: boolean) => void,
+  reject: (error: any) => void,
+) => ({
+  type: authTypes.RESET_PASSWORD,
   data,
   resolve,
   reject,

@@ -4,10 +4,10 @@ import { useThemeContext } from '@/context/ThemeContext';
 import Typography from '@/component/shared/Typography';
 import Stack from '@/component/shared/Stack';
 import Menu from '@/component/shared/Menu';
-import { Image, Pressable, ScrollView } from 'react-native';
+import { Pressable, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { fetchYoutubeOEmbed, addPlaylist, YoutubeOEmbedResponse, getChildPlaylists } from '@/modules/App/api/appApi';
+import { fetchYoutubeOEmbed } from '@/modules/App/api/appApi';
 import Clipboard from '@react-native-clipboard/clipboard';
 import {
   StyledGradientButton,
@@ -22,11 +22,11 @@ import {
   VideoPreviewTitle,
   VideoPreviewTitleText
 } from './styles';
-import { Kid } from '../../store/appTypes';
 import { navigateToNestedScreen } from '@/navigation/NavigationService';
 import toast from '@/utils/toast';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import * as appActions from '@/modules/App/store/appActions';
+import { RootState } from '@/store';
 
 interface VideoProps {
   id?: number;
@@ -160,6 +160,7 @@ const AddChildPlaylists = (props: any) => {
   const { kid } = props.route.params;
   const { theme } = useThemeContext();
   const dispatch = useDispatch();
+  const playlists = useSelector((state: RootState) => state.app.playlists);
   const [videos, setVideos] = useState<VideoProps[]>([]);
   const [mode, setMode] = useState<'input' | 'preview'>('input');
   const [loading, setLoading] = useState(false);
@@ -167,22 +168,27 @@ const AddChildPlaylists = (props: any) => {
 
   const childName = `${kid.firstName ?? ""} ${kid.lastName ?? ""}`.trim() ?? "Child";
 
+  const getChildPlaylists = async () => {
+    try {
+      setLoading(true)
+      await new Promise((resolve, reject) => {
+        return dispatch(appActions.getPlaylists(kid.id, resolve, reject))
+      }).then(res => {
+        setVideos(res as VideoProps[])
+      })
+      setLoading(false)
+    } catch (error) {
+      setLoading(false)
+      console.error(error)
+    }
+  }
+
   useEffect(() => {
     if (kid.id) {
-      setLoading(true);
-      getChildPlaylists(kid.id).then(res => {
-        if (res.length > 0) {
-          setVideos(res);
-        } else {
-          setVideos([{ ...defaultVideo, child: kid.id }]);
-        }
-      }).finally(() => {
-        setLoading(false);
-      });
+      getChildPlaylists()
     }
     return () => {
-      setVideos([]);
-
+      dispatch(appActions.setPlaylists([]))
     }
   }, [kid.id]);
 

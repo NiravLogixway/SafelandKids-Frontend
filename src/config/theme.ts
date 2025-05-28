@@ -143,6 +143,8 @@ export const CombinedDefaultTheme = {
     onSurfaceDisabled: 'rgba(32, 26, 25, 0.38)',
     backdrop: 'rgba(59, 45, 44, 0.4)',
     info: 'rgba(27, 105, 253, 1)',
+    headerBg: '#ffffff',
+    bottomNavigationBg: '#ffffff',
     background: {
       default: NavigationDefaultTheme.colors.background,
       primary: '#ffffff',
@@ -199,8 +201,8 @@ export const CombinedDarkTheme = {
   dark: true,
   colors: {
     ...NavigationDarkTheme.colors,
-    mainBg: 'transparent',
-    headerBg: '#192332',
+    mainBg: 'rgb(46, 46, 46)',
+    headerBg: 'rgb(46, 46, 46)',
     headerShadow: '#000000',
     bottomNavigationBg: '#1E293B',
     bottomNavigationShadow: '#000000',
@@ -244,7 +246,7 @@ export const CombinedDarkTheme = {
     errorContainer: 'rgb(255, 218, 214)',
     onErrorContainer: 'rgb(65, 0, 2)',
     onBackground: 'rgb(231, 225, 229)',
-    surface: 'rgb(29, 27, 30)',
+    surface: 'rgb(103, 103, 103)',
     onSurface: 'rgb(231, 225, 229)',
     surfaceVariant: 'rgb(74, 69, 78)',
     onSurfaceVariant: 'rgb(204, 196, 206)',
@@ -259,11 +261,12 @@ export const CombinedDarkTheme = {
     onSurfaceDisabled: 'rgba(231, 225, 229, 0.38)',
     backdrop: 'rgba(51, 47, 55, 0.4)',
     background: {
-      default: NavigationDarkTheme.colors.background,
+      default: NavigationDefaultTheme.colors.background,
       primary: '#ffffff',
+      secondary: '#7A28FC',
       gradient: {
         primary: {
-          colors: ['rgba(28, 130, 109, 1)', 'rgba(40, 178, 151, 1)'],
+          colors: ['rgba(232, 93, 4, 1)', 'rgba(250, 140, 70, 1)'],
           start: {x: 0, y: 0},
           end: {x: 1, y: 0},
         },
