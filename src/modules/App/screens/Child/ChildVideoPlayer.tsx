@@ -27,8 +27,15 @@ const ChildVideoPlayer: React.FC = (props: any) => {
 
   useEffect(() => {
     Orientation.addDeviceOrientationListener(orientationChangeHandler);
+    const initialOrientation = Orientation.getInitialOrientation();
+    if (initialOrientation.toLowerCase() !== 'portrait') {
+      setTabBarVisible(false);
+    }
     return () => {
       Orientation.removeDeviceOrientationListener(orientationChangeHandler);
+      clearInterval(timeInterval);
+      setCurrentVideo(null);
+      setTabBarVisible(true);
     };
   }, []);
 
@@ -76,6 +83,7 @@ const ChildVideoPlayer: React.FC = (props: any) => {
           videoTitle={currentVideo.name}
           videoThumbnail={currentVideo.image}
           watchDuration={currentVideo.watchDuration}
+          autoPlay
           onProgress={async (state, player) => {
             if (state === "playing" || state === "paused" || state === "ended") {
               clearInterval(timeInterval);

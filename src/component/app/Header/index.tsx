@@ -32,7 +32,7 @@ const Header = ({
       goBackWithDispatch();
     }
   };
-  console.log(theme.colors.headerBg, "headerBg")
+
   return (
     <Box py={3} px={3} style={{ backgroundColor: theme.colors.headerBg }}>
       <Stack direction="row" align="center" justify="space-between" gap={1}>

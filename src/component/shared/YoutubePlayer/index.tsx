@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { Dimensions, View, TouchableWithoutFeedback, ImageBackground, ActivityIndicator } from 'react-native';
+import { Dimensions, View, ActivityIndicator } from 'react-native';
 import Orientation from 'react-native-orientation-locker';
 import YoutubePlayer, { YoutubeIframeRef } from 'react-native-youtube-iframe';
 import bg2Image from '@/assets/images/bg2Image.png';
@@ -7,19 +7,10 @@ import {
   Container,
   BackgroundImage,
   PlayerContainer,
-  Overlay,
-  OverlayHeader,
-  Thumbnail,
-  TitleText,
-  ControlsContainer,
-  PlayPauseButton,
-  ProgressBarContainer,
-  ProgressBar,
-  TimeContainer,
-  TimeText
 } from './styles';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import Stack from '../Stack';
+import IframeOverlay from './IframeOverlay';
+import Typography from '../Typography';
 
 interface YouTubeWebViewProps {
   videoId: string;
@@ -34,30 +25,25 @@ interface YouTubeWebViewProps {
   onProgress?: (state: string, player: YoutubeIframeRef) => void;
 }
 
-const formatTime = (seconds: number) => {
-  const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-  const s = Math.floor(seconds % 60).toString().padStart(2, '0');
-  return `${m}:${s}`;
-};
+let timerInterval: NodeJS.Timeout;
+let hideOverlayTimeout: NodeJS.Timeout;
 
 const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ videoId, videoTitle, videoThumbnail, watchDuration, autoPlay = true, onEnd, onPlay, onPause, onSeek, onProgress }) => {
-  const [orientation, setOrientation] = useState("portrait");
   const [playing, setPlaying] = useState(autoPlay);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const playerRef = useRef<YoutubeIframeRef>(null);
   const [overlayVisible, setOverlayVisible] = useState(false);
-  const hideOverlayTimeout = useRef<NodeJS.Timeout | null>(null);
   const [videoEnded, setVideoEnded] = useState(false);
   const [isPortrait, setIsPortrait] = useState(true);
 
   const orientationChangeHandler = (orientation: string) => {
-    setOrientation(orientation);
     setIsPortrait(orientation.toLowerCase() === 'portrait');
   };
 
   useEffect(() => {
+    if (hideOverlayTimeout) clearTimeout(hideOverlayTimeout);
     Orientation.lockToPortrait();
     Orientation.addOrientationListener(orientationChangeHandler);
     return () => {
@@ -91,9 +77,8 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ videoId, videoTitle, vid
   }
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
     if (playing) {
-      interval = setInterval(async () => {
+      timerInterval = setInterval(async () => {
         if (playerRef.current && typeof playerRef.current.getCurrentTime === 'function') {
           const time = await playerRef.current.getCurrentTime();
           setCurrentTime(time);
@@ -101,8 +86,8 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ videoId, videoTitle, vid
       }, 1000);
     }
     return () => {
-      if (interval) {
-        clearInterval(interval);
+      if (timerInterval) {
+        clearInterval(timerInterval);
       }
     };
   }, [playing]);
@@ -119,18 +104,10 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ videoId, videoTitle, vid
 
   const togglePlaying = () => {
     setPlaying(p => !p);
-    if (playing) {
-      onPause?.();
-    } else {
-      onPlay?.();
-    }
   };
 
   const handleSeek = async (e: any) => {
-    const { locationX } = e.nativeEvent;
-    const barWidth = playerWidth * 0.8;
-    const percent = locationX / barWidth;
-    const seekTo = percent * duration;
+    const { seekTo } = e;
     if (playerRef.current && typeof playerRef.current.seekTo === 'function') {
       await playerRef.current.seekTo(seekTo, true);
       setCurrentTime(seekTo);
@@ -138,48 +115,51 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ videoId, videoTitle, vid
     }
   };
 
+  const handleSeekMove = (e: any) => {
+    if (hideOverlayTimeout) clearTimeout(hideOverlayTimeout);
+    handleSeek(e)
+  }
+
   const showOverlay = () => {
     setOverlayVisible(true);
     if (playing) {
-      if (hideOverlayTimeout.current) clearTimeout(hideOverlayTimeout.current);
-      hideOverlayTimeout.current = setTimeout(() => setOverlayVisible(false), 1000);
+      if (hideOverlayTimeout) clearTimeout(hideOverlayTimeout);
+      hideOverlayTimeout = setTimeout(() => setOverlayVisible(false), 1000);
     }
   };
 
-  useEffect(() => {
-    if (playing) {
-      if (hideOverlayTimeout.current) clearTimeout(hideOverlayTimeout.current);
-      hideOverlayTimeout.current = setTimeout(() => setOverlayVisible(false), 1000);
-    } else {
-      setOverlayVisible(true);
-      if (hideOverlayTimeout.current) clearTimeout(hideOverlayTimeout.current);
-    }
-    return () => {
-      if (hideOverlayTimeout.current) clearTimeout(hideOverlayTimeout.current);
-    };
-  }, [playing]);
-
-  useEffect(() => () => {
-    if (hideOverlayTimeout.current) clearTimeout(hideOverlayTimeout.current);
-  }, []);
-
-  const onChangeState = useCallback((state: string) => {
+  const triggerEvents = (state: string) => {
     const videoPlayer = playerRef.current;
-    if (state === 'ended') {
-      setOverlayVisible(true);
-      setVideoEnded(true);
-      setPlaying(false);
-      onEnd?.();
-    } else if (state === 'playing') {
-      setVideoEnded(false);
-      setIsLoading(false);
-    } else if (state === 'buffering') {
-      setIsLoading(true);
-    }
     if (videoPlayer && typeof onProgress === 'function') {
       onProgress(state, videoPlayer);
     }
+    if (state === 'ended') {
+      onEnd?.();
+    } else if (state === 'playing') {
+      onPlay?.();
+    } else if (state === 'paused') {
+      onPause?.();
+    }
+  }
+
+  const onChangeState = useCallback((state: string) => {
+    setVideoEnded(state === "ended");
+    setIsLoading(state === 'buffering' || state === 'unstarted');
+    showOverlay();
+    triggerEvents(state);
   }, [playerRef.current]);
+
+  const handleMoveBackVideo = () => {
+    if (playerRef.current && typeof playerRef.current.seekTo === 'function' && currentTime - 10 > 0) {
+      playerRef.current.seekTo(currentTime - 10, true);
+    }
+  }
+
+  const handleMoveNextVideo = () => {
+    if (playerRef.current && typeof playerRef.current.seekTo === 'function' && currentTime + 10 < duration) {
+      playerRef.current.seekTo(currentTime + 10, true);
+    }
+  }
 
   return (
     <PlayerContainer>
@@ -225,64 +205,26 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ videoId, videoTitle, vid
                   <ActivityIndicator size="large" color="#fff" />
                 </View>
               )}
-              <Overlay pointerEvents="box-none">
-                <TouchableWithoutFeedback onPress={showOverlay}>
-                  {videoEnded ? (
-                    <ImageBackground
-                      source={{ uri: videoThumbnail }}
-                      style={{ flex: 1, width: '100%', height: '100%' }}
-                      resizeMode="cover"
-                    >
-                      {overlayVisible && (
-                        <>
-                          <OverlayHeader>
-                            <Thumbnail source={{ uri: videoThumbnail }} />
-                            <TitleText numberOfLines={1}>{videoTitle}</TitleText>
-                          </OverlayHeader>
-                          <ControlsContainer>
-                            <PlayPauseButton onPress={togglePlaying} activeOpacity={0.8}>
-                              <Icon name={playing ? 'pause' : 'play-arrow'} size={36} color="#fff" />
-                            </PlayPauseButton>
-                          </ControlsContainer>
-                          <ProgressBarContainer onStartShouldSetResponder={() => true} onResponderRelease={handleSeek} style={{ position: 'absolute', bottom: 8, left: '10%' }}>
-                            <ProgressBar progress={duration ? currentTime / duration : 0} />
-                          </ProgressBarContainer>
-                          <TimeContainer style={{ position: 'absolute', bottom: 30, left: '10%', width: '80%' }}>
-                            <TimeText>{formatTime(currentTime)}</TimeText>
-                            <TimeText>{formatTime(duration)}</TimeText>
-                          </TimeContainer>
-                        </>
-                      )}
-                    </ImageBackground>
-                  ) : (
-                    <View style={{ flex: 1, width: '100%', height: '100%' }}>
-                      {overlayVisible && (
-                        <>
-                          <OverlayHeader>
-                            <Thumbnail source={{ uri: videoThumbnail }} />
-                            <TitleText numberOfLines={1}>{videoTitle}</TitleText>
-                          </OverlayHeader>
-                          <ControlsContainer>
-                            <PlayPauseButton onPress={togglePlaying} activeOpacity={0.8}>
-                              <Icon name={playing ? 'pause' : 'play-arrow'} size={36} color="#fff" />
-                            </PlayPauseButton>
-                          </ControlsContainer>
-                          <ProgressBarContainer onStartShouldSetResponder={() => true} onResponderRelease={handleSeek} style={{ position: 'absolute', bottom: 8, left: '10%' }}>
-                            <ProgressBar progress={duration ? currentTime / duration : 0} />
-                          </ProgressBarContainer>
-                          <TimeContainer style={{ position: 'absolute', bottom: 30, left: '10%', width: '80%' }}>
-                            <TimeText>{formatTime(currentTime)}</TimeText>
-                            <TimeText>{formatTime(duration)}</TimeText>
-                          </TimeContainer>
-                        </>
-                      )}
-                    </View>
-                  )}
-                </TouchableWithoutFeedback>
-              </Overlay>
+              <IframeOverlay
+                videoThumbnail={videoThumbnail}
+                videoTitle={videoTitle}
+                playing={playing}
+                currentTime={currentTime}
+                duration={duration}
+                videoEnded={videoEnded}
+                overlayVisible={overlayVisible}
+                onPlayPause={togglePlaying}
+                onSeek={handleSeek}
+                onSeekMove={handleSeekMove}
+                onOverlayPress={showOverlay}
+                onMoveBackVideo={handleMoveBackVideo}
+                onMoveNextVideo={handleMoveNextVideo}
+              />
             </Stack>
           </Container>
-        ) : null}
+        ) : <Stack align='center' justify='center' style={{ flex: 1 }}>
+          <Typography variant='h4' color='white'>No video selected</Typography>
+        </Stack>}
       </BackgroundImage>
     </PlayerContainer>
   );
