@@ -1,5 +1,5 @@
 import AuthLayout from '@/layouts/AuthLayout';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ResetPasswordContainer, StyledInput, ResetButtonContainer, GradientBackground, ResetButtonText } from './styles';
 import { useThemeContext } from '@/context/ThemeContext';
 import Form from '@/component/shared/Form';
@@ -27,8 +27,6 @@ const ResetPassword = (props: any) => {
   const dispatch = useDispatch();
   const navigation = useNavigation<ResetPasswordScreenNavigationProp>();
   const { theme } = useThemeContext();
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const initialValues = {
@@ -41,8 +39,9 @@ const ResetPassword = (props: any) => {
     try {
       await new Promise((resolve, reject) => {
         const payload = {
-          token,
+          code: token,
           password: values.password,
+          passwordConfirmation: values.confirmPassword,
         };
         dispatch(authActions.resetPassword(payload, resolve, reject));
       });
@@ -64,15 +63,13 @@ const ResetPassword = (props: any) => {
         >
           {({ handleSubmit }: any) => (
             <>
-              <StyledInput
+              <Form.Field.PasswordInput
                 name="password"
                 placeholder="New Password"
-                password={!showPassword}
               />
-              <StyledInput
+              <Form.Field.PasswordInput
                 name="confirmPassword"
                 placeholder="Confirm Password"
-                password={!showConfirmPassword}
               />
               <GradientBackground colors={theme.colors.background.gradient.primary.colors} theme={theme}>
                 <ResetButtonContainer loading={isLoading} onPress={handleSubmit}>

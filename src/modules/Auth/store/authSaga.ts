@@ -110,7 +110,7 @@ function* handleForgetPassword({
   try {
     const res = yield call(authApi.forgetPassword, email);
     if (res.ok) {
-      toast.success(res.message);
+      toast.success(res.message || 'Link sent to your email');
       resolve(true);
     } else {
       reject(res.message);
@@ -128,12 +128,12 @@ function* handleResetPassword({
 }: authTypes.ResetPasswordPayload): Generator<any, void, any> {
   try {
     const res = yield call(authApi.resetPassword, data);
-    if (res.ok) {
-      toast.success('Password reset successfully');
+    if (res.jwt) {
+      toast.success(res?.message || 'Password reset successfully');
       resolve(true);
       navigate('Login', {});
     } else {
-      reject(res.message);
+      reject(res?.message || 'Something went wrong!!');
     }
   } catch (error: any) {
     toast.error(error.error?.message || 'Something went wrong!!');

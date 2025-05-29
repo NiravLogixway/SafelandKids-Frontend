@@ -45,7 +45,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
               justifyContent: 'flex-end',
               gap: theme.spacing.md,
             }}>
-            <Button buttonColor={theme.colors.primary} onPress={onCancel}>Cancel</Button>
+            <Button buttonColor={theme.colors.button.transparent} textColor={theme.colors.text.textSecondary} onPress={onCancel}>Cancel</Button>
             <Button
               mode="contained"
               onPress={onDelete}

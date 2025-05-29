@@ -123,6 +123,7 @@ export const CombinedDefaultTheme = {
     onTertiary: 'rgb(255, 255, 255)',
     tertiaryContainer: 'rgb(254, 223, 166)',
     onTertiaryContainer: 'rgb(38, 25, 0)',
+    errorText: 'rgba(255, 66, 66, 0.71)',
     error: 'rgb(186, 26, 26)',
     onError: 'rgb(255, 255, 255)',
     errorContainer: 'rgb(255, 218, 214)',
@@ -186,6 +187,7 @@ export const CombinedDefaultTheme = {
     button: {
       primary: '#DD0A1D',
       secondary: '#D79A37',
+      transparent: 'transparent',
     },
     border: {
       level0: 'rgba(196, 197, 200, 1)',
@@ -241,6 +243,7 @@ export const CombinedDarkTheme = {
     onTertiary: 'rgb(255, 255, 255)',
     tertiaryContainer: 'rgb(254, 223, 166)',
     onTertiaryContainer: 'rgb(38, 25, 0)',
+    errorText: 'rgba(255, 66, 66, 0.71)',
     error: 'rgb(186, 26, 26)',
     onError: 'rgb(255, 255, 255)',
     errorContainer: 'rgb(255, 218, 214)',
@@ -301,6 +304,7 @@ export const CombinedDarkTheme = {
     button: {
       primary: '#DD0A1D',
       secondary: '#D79A37',
+      transparent: 'transparent',
     },
     border: {
       level0: 'rgba(150, 150, 150, 1)',

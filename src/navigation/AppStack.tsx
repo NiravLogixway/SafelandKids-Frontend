@@ -33,28 +33,101 @@ const HomeStack = createNativeStackNavigator<HomeStack>();
 const ChildStack = createNativeStackNavigator<ChildStack>();
 const ProfileStack = createNativeStackNavigator<ProfileStack>();
 
-const HomeNav = () => (
-  <HomeStack.Navigator screenOptions={{ headerShown: false }}>
-    <HomeStack.Screen name="ChildList" component={Home} />
-    <HomeStack.Screen name="ChildVideoPlaylist" component={ChildPlaylist} initialParams={{ kid: undefined }} />
-    <HomeStack.Screen name="ChildVideoPlayer" component={ChildVideoPlayer} initialParams={{ kid: undefined, video: undefined }} />
-    <HomeStack.Screen name="Passcode" component={Passcode} initialParams={{ kid: undefined }} />
-  </HomeStack.Navigator>
-);
+const HomeNav = () => {
+  const { handleBackPress, isChildMode } = useTabNavigationGuard();
 
-const ChildNav = () => (
-  <ChildStack.Navigator screenOptions={{ headerShown: false }}>
-    <ChildStack.Screen name="ChildForm" component={ChildForm} initialParams={{ mode: 'add', kid: undefined }} />
-    <ChildStack.Screen name="ChildPlaylist" component={AddChildPlaylists} />
-  </ChildStack.Navigator>
-);
+  return (
+    <HomeStack.Navigator
+      screenOptions={{
+        headerShown: false,
+        gestureDirection: 'horizontal',
+        fullScreenGestureEnabled: true,
+        animation: 'slide_from_right',
+      }}
+    >
+      <HomeStack.Screen
+        name="ChildList"
+        component={Home}
+      />
+      <HomeStack.Screen
+        name="ChildVideoPlaylist"
+        component={ChildPlaylist}
+        initialParams={{ kid: undefined }}
+        options={{
+          gestureEnabled: !isChildMode,
+        }}
+      />
+      <HomeStack.Screen
+        name="ChildVideoPlayer"
+        component={ChildVideoPlayer}
+        initialParams={{ kid: undefined, video: undefined }}
+        options={{
+          gestureResponseDistance: {
+            start: 100,
+            end: 100,
+            top: 100,
+            bottom: 100,
+          }
+        }}
+      />
+      <HomeStack.Screen
+        name="Passcode"
+        component={Passcode}
+        initialParams={{ kid: undefined }}
+      />
+    </HomeStack.Navigator>
+  );
+};
 
-const ProfileNav = () => (
-  <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
-    <ProfileStack.Screen name="Profile" component={Profile} />
-    <ProfileStack.Screen name="EditProfile" component={EditProfile} />
-  </ProfileStack.Navigator>
-);
+const ChildNav = () => {
+  const { handleBackPress, isChildMode } = useTabNavigationGuard();
+
+  return (
+    <ChildStack.Navigator
+      screenOptions={{
+        headerShown: false,
+        gestureDirection: 'horizontal',
+        fullScreenGestureEnabled: true,
+        animation: 'slide_from_right',
+      }}
+    >
+      <ChildStack.Screen
+        name="ChildForm"
+        component={ChildForm}
+        initialParams={{ mode: 'add', kid: undefined }}
+
+      />
+      <ChildStack.Screen
+        name="ChildPlaylist"
+        component={AddChildPlaylists}
+      />
+    </ChildStack.Navigator>
+  );
+};
+
+const ProfileNav = () => {
+  const { handleBackPress, isChildMode } = useTabNavigationGuard();
+
+  return (
+    <ProfileStack.Navigator
+      screenOptions={{
+        headerShown: false,
+        gestureDirection: 'horizontal',
+        fullScreenGestureEnabled: true,
+        animation: 'slide_from_right',
+      }}
+    >
+      <ProfileStack.Screen
+        name="Profile"
+        component={Profile}
+      />
+      <ProfileStack.Screen
+        name="EditProfile"
+        component={EditProfile}
+      />
+    </ProfileStack.Navigator>
+  );
+};
 
 const getTabListeners = (isChildMode: boolean, handleTabPress: () => void) => ({
   tabPress: (e: any) => {

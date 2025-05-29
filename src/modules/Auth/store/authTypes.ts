@@ -60,8 +60,9 @@ export interface ForgetPasswordPayload {
 
 export interface ResetPasswordPayload {
   data: {
-    token: string;
+    code: string;
     password: string;
+    passwordConfirmation: string;
   };
   resolve: (value: boolean) => void;
   reject: (error: any) => void;

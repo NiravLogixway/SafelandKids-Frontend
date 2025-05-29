@@ -18,6 +18,7 @@ declare module 'styled-components/native' {
       onTertiary: string;
       tertiaryContainer: string;
       onTertiaryContainer: string;
+      errorText: string;
       error: string;
       onError: string;
       errorContainer: string;

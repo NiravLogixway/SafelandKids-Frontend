@@ -7,8 +7,11 @@ import { logout } from '@/modules/Auth/store/authActions';
 import * as authActions from '@/modules/Auth/store/authActions';
 import { RootState } from '@/store';
 import toast from '@/utils/toast';
+import Stack from '@/component/shared/Stack';
+import { useThemeContext } from '@/context/ThemeContext';
 
 const ProfileView = () => {
+  const { theme } = useThemeContext()
   const dispatch = useDispatch();
   const currentUser = useSelector((state: RootState) => state.auth.user);
   const [isAccountDeleteModal, isSetAccountDeleteModal] = useState(false);
@@ -57,17 +60,19 @@ const ProfileView = () => {
 
   return (
     <ProfileContainer>
-      {profileMenus.map((menu, index) => (
-        <MenuList key={index}>
-          <MenuItem isLast={profileMenus.length - 1 === index}>
-            <MenuText
-              isLast={profileMenus.length - 1 === index}
-              onPress={() => handleMenuAction(menu)}>
-              {menu.label}
-            </MenuText>
-          </MenuItem>
-        </MenuList>
-      ))}
+      
+        {profileMenus.map((menu, index) => (
+          <MenuList key={index}>
+            <MenuItem isLast={profileMenus.length - 1 === index}>
+              <MenuText
+                isLast={profileMenus.length - 1 === index}
+                onPress={() => handleMenuAction(menu)}>
+                {menu.label}
+              </MenuText>
+            </MenuItem>
+          </MenuList>
+        ))}
+     
       <DeleteModal
         visible={isAccountDeleteModal}
         onDelete={deleteAccount}

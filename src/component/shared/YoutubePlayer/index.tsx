@@ -13,6 +13,7 @@ import IframeOverlay from './IframeOverlay';
 import Typography from '../Typography';
 
 interface YouTubeWebViewProps {
+  video: any;
   videoId: string;
   videoTitle: string;
   videoThumbnail: string;
@@ -25,18 +26,30 @@ interface YouTubeWebViewProps {
   onProgress?: (state: string, player: YoutubeIframeRef) => void;
 }
 
+interface CustomYoutubeIframeRef extends YoutubeIframeRef {
+  video?: any;
+}
+
 let timerInterval: NodeJS.Timeout;
 let hideOverlayTimeout: NodeJS.Timeout;
 
-const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ videoId, videoTitle, videoThumbnail, watchDuration, autoPlay = true, onEnd, onPlay, onPause, onSeek, onProgress }) => {
+const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTitle, videoThumbnail, watchDuration, autoPlay = true, onEnd, onPlay, onPause, onSeek, onProgress }) => {
+  const playerRef = useRef<CustomYoutubeIframeRef>(null);
   const [playing, setPlaying] = useState(autoPlay);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const playerRef = useRef<YoutubeIframeRef>(null);
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [videoEnded, setVideoEnded] = useState(false);
   const [isPortrait, setIsPortrait] = useState(true);
+
+  useEffect(() => {
+    // Update playerRef when video changes
+    if (playerRef.current && video) {
+      const currentRef = playerRef.current;
+      playerRef.current = { ...currentRef, video };
+    }
+  }, [videoId]);
 
   const orientationChangeHandler = (orientation: string) => {
     setIsPortrait(orientation.toLowerCase() === 'portrait');
@@ -48,6 +61,8 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ videoId, videoTitle, vid
     Orientation.addOrientationListener(orientationChangeHandler);
     return () => {
       Orientation.removeOrientationListener(orientationChangeHandler);
+      if (timerInterval) clearInterval(timerInterval);
+      if (hideOverlayTimeout) clearTimeout(hideOverlayTimeout);
     };
   }, []);
 
@@ -147,7 +162,7 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ videoId, videoTitle, vid
     setIsLoading(state === 'buffering' || state === 'unstarted');
     showOverlay();
     triggerEvents(state);
-  }, [playerRef.current]);
+  }, []);
 
   const handleMoveBackVideo = () => {
     if (playerRef.current && typeof playerRef.current.seekTo === 'function' && currentTime - 10 > 0) {
@@ -172,6 +187,7 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ videoId, videoTitle, vid
             <Stack>
               <View style={{ width: playerWidth, height: playerHeight }} pointerEvents="none">
                 <YoutubePlayer
+                  key={videoId}
                   ref={playerRef}
                   height={playerHeight}
                   width={playerWidth}

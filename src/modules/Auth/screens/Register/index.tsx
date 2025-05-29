@@ -8,6 +8,7 @@ import Stack from '@/component/shared/Stack';
 import { ScrollView } from 'react-native-gesture-handler';
 import { register } from '../../store/authActions';
 import { useDispatch } from 'react-redux';
+import { Linking, Pressable, Text } from 'react-native';
 
 const validationSchema = Yup.object().shape({
   firstName: Yup.string().required('First name is required'),
@@ -21,7 +22,6 @@ const validationSchema = Yup.object().shape({
 const Register = () => {
   const dispatch = useDispatch();
   const { theme } = useThemeContext();
-  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const initialValues = {
@@ -60,12 +60,12 @@ const Register = () => {
                 <StyledInput name="firstName" placeholder="FirstName" />
                 <StyledInput name="lastName" placeholder="LastName" />
                 <StyledInput name="email" placeholder="E-mail" />
-                <Stack direction="row" align='center' justify='space-between' style={{ width: "100%" }}>
+                <Stack direction="row" align='center' justify='space-between' style={{ width: "100%", marginTop: 8 }}>
                   <RegisterText variant="h3" >Passcode</RegisterText>
                   <Form.Field.OtpInput name="passcode" pinCount={4} />
                 </Stack>
                 <StyledInput name="username" placeholder="UserName" />
-                <StyledInput name="password" placeholder="Password" password={!showPassword} />
+                <Form.Field.PasswordInput name="password" placeholder="Password" />
                 <GradientBackground colors={theme.colors.background.gradient.primary.colors} theme={theme}>
                   <RegisterButtonContainer loading={isLoading} onPress={handleSubmit}>
                     <RegisterButtonText>Create Button</RegisterButtonText>
@@ -75,11 +75,18 @@ const Register = () => {
             )}
           </Form>
           <TermsText variant='h5'>
-            By click in Register you agree to our <LinkText>Terms & Conditions</LinkText> Privacy Policy
+            By click in Register you agree to our{' '}
+            <Pressable onPress={() => Linking.openURL('https://safelandkids.com/terms-and-conditions.html')}>
+              <LinkText style={{ textDecorationLine: 'underline', marginTop: 4 }}>Terms & Conditions</LinkText>
+            </Pressable>
+            {' '}and{' '}
+            <Pressable onPress={() => Linking.openURL('https://safelandkids.com/privacy-policy.html')}>
+              <LinkText style={{ textDecorationLine: 'underline', marginTop: 4 }}>Privacy Policy</LinkText>
+            </Pressable>
           </TermsText>
         </RegisterContainer>
       </ScrollView>
-    </AuthLayout>
+    </AuthLayout >
   )
 }
 

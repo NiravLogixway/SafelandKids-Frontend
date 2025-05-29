@@ -7,9 +7,12 @@ import Box from '@/component/shared/Box';
 import {Switch} from 'react-native-paper';
 
 export const ProfileContainer = styled(Box)(({theme}) => ({
-  flex: 1,
   marginBlock: theme.spacing.lg,
   borderRadius: theme.borderRadius.lg,
+  backgroundColor: theme.colors.background.secondary,
+  margin: theme.spacing.md,
+  paddingBlock: theme.spacing.md,
+  height: 'max-content',
 }));
 
 export const MenuList = styled(Box)(({theme}) => ({
@@ -28,7 +31,7 @@ export const MenuItem = styled(Box)(({theme, isLast}) => ({
 export const MenuText = styled.Text<{isLast?: boolean}>(({theme, isLast}) => ({
   fontSize: 16,
   fontWeight: 600,
-  color: isLast ? theme.colors.error : theme.colors.text.primary,
+  color: theme.colors.text.primary,
 }));
 
 export const ThemeSwitch = styled(Switch)(({theme}) => ({

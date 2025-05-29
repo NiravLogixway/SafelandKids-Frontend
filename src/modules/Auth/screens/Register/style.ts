@@ -82,4 +82,6 @@ export const TermsText = styled(Typography)(({theme}) => ({
 export const LinkText = styled(Typography)(({theme}) => ({
   color: theme.colors.text.primary,
   textDecorationLine: 'underline',
+  position: 'relative',
+  top: 10,
 }));

@@ -31,7 +31,6 @@ const validationSchema = Yup.object().shape({
 const Login = () => {
   const dispatch = useDispatch();
   const { theme } = useThemeContext();
-  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const initialValues = {
@@ -48,10 +47,6 @@ const Login = () => {
     });
   };
 
-  const toggleShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-
   return (
     <AuthLayout title="Login">
       <LoginContainer>
@@ -66,10 +61,9 @@ const Login = () => {
                 name="identifier"
                 placeholder="Email"
               />
-              <StyledInput
+              <Form.Field.PasswordInput
                 name="password"
                 placeholder="Password"
-                password={!showPassword}
               />
               <ForgotPasswordText
                 onPress={() => {

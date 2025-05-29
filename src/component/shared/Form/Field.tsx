@@ -8,6 +8,7 @@ import Picker from './Picker';
 import Datepicker from './DatePicker';
 import Textarea from './Textarea';
 import OtpInput from './OtpInput';
+import PasswordInput from './PasswordInput';
 
 interface props {
   label: string;
@@ -37,7 +38,7 @@ const generateField = (FormComponent: any) => {
   }: props) => {
     const { theme } = useThemeContext();
     const fieldId = uniqueId('form-field-');
-    const errorText = helperText ? helperText : getErrorText(error, errorMsg); // ...helperText overridden by otherProps
+    const errorText = helperText ? helperText : getErrorText(error, errorMsg);
     const isError = !!(error || errorMsg);
     return (
       <>
@@ -67,20 +68,19 @@ const generateField = (FormComponent: any) => {
   return FieldComponent;
 };
 
-export default {
+const getErrorText = (error: string, errorMsg: string) => {
+  if (error) return error;
+  if (errorMsg) return errorMsg;
+  return '';
+};
+
+const Field = {
   Input: generateField(Input),
   OtpInput: generateField(OtpInput),
+  PasswordInput: generateField(PasswordInput),
   // Picker: generateField(Picker),
   // DatePicker: generateField(Datepicker),
   // Textarea: generateField(Textarea),
-  // Phone: generateField(Phone),
-  // Picker: generateField(Picker),
-  // Location: generateField(LocationPlace),
-  // File: generateField(File),
 };
 
-const getErrorText = (error: any, errorMsg: string) => {
-  if (error) return error;
-  else if (errorMsg) return errorMsg;
-  else false;
-};
+export default Field;
