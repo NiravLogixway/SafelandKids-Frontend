@@ -6,6 +6,7 @@ import Typography from '@/component/shared/Typography';
 import { HomeContainer, KidCardWrapper, GradientBackground, AddKidButton } from './styles';
 import { TouchableOpacity, FlatList, View, Pressable } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useThemeContext } from '@/context/ThemeContext';
 import Stack from '@/component/shared/Stack';
 import { navigate, navigateToNestedScreen } from '@/navigation/NavigationService';
@@ -15,6 +16,8 @@ import { RootState } from '@/store';
 import { Kid } from '../../store/appTypes';
 import { setItem } from '@/utils/localstorage';
 import toast from '@/utils/toast';
+import Empty from '@/component/app/Empty';
+import Spinner from '@/component/shared/Spinner';
 
 const menuItems = [
   { label: 'Edit', value: 'edit', id: 1 },
@@ -27,9 +30,19 @@ const Home = () => {
   const kids = useSelector((state: RootState) => state.app.kids);
   const currentKid = useSelector((state: RootState) => state.app.currentKid);
   const [menuVisible, setMenuVisible] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const getKids = async () => {
+    setLoading(true);
+    await new Promise((resolve, reject) => {
+      dispatch(appActions.getKids(resolve, reject));
+    }).finally(() => {
+      setLoading(false);
+    });
+  }
 
   useEffect(() => {
-    dispatch(appActions.getKids());
+    getKids();
   }, [dispatch]);
 
   const handleToggle = (kid: Kid) => {
@@ -58,7 +71,7 @@ const Home = () => {
   };
 
   const redirectOnChildPlaylists = (item: Kid) => {
-    navigateToNestedScreen('Child', 'ChildPlaylist', { kid: item });
+    navigate('ChildPlaylist', { kid: item });
   }
 
   const renderKidItem = ({ item }: { item: Kid }) => (
@@ -104,13 +117,23 @@ const Home = () => {
     <AppLayout title="Home">
       <HomeContainer>
         <View style={{ flex: 1, paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.xl }}>
-          <FlatList
-            data={kids}
-            renderItem={renderKidItem}
-            keyExtractor={item => item.id?.toString() ?? ''}
-            contentContainerStyle={{ paddingBottom: theme.spacing.sm }}
-            showsVerticalScrollIndicator={false}
-          />
+          {loading ? <Spinner size="small" color={theme.colors.text.primary} /> :
+            kids.length === 0 ? (
+              <Stack align="center" justify="center" style={{ flex: 1 }}>
+                <Empty
+                  title="Add Your Kids to Get Started"
+                  icon={<MaterialIcons name="child-care" size={80} color={theme.colors.text.primary} />}
+                />
+              </Stack>
+            ) : (
+              <FlatList
+                data={kids}
+                renderItem={renderKidItem}
+                keyExtractor={item => item.id?.toString() ?? ''}
+                contentContainerStyle={{ paddingBottom: theme.spacing.sm }}
+                showsVerticalScrollIndicator={false}
+              />
+            )}
         </View>
         <AddKidButton>
           <TouchableOpacity

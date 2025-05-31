@@ -10,15 +10,18 @@ export const bottomNavigationsTab = {
     name: 'Home',
     icon: HomeIcon,
     iconFocused: HomeIconFocused,
+    initialScreen: 'ChildList',
   },
   Child: {
     name: 'Plus',
     icon: PlusIcon,
     iconFocused: PlusIconFocused,
+    initialScreen: 'ChildForm',
   },
   Profile: {
     name: 'Profile',
     icon: ProfileIcon,
     iconFocused: ProfileIconFocused,
+    initialScreen: 'Profile',
   },
 };

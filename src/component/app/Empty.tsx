@@ -7,39 +7,43 @@ import Stack from '../shared/Stack';
 import Spacer from '../shared/Spacer';
 import Box from '../shared/Box';
 import { Button } from 'react-native-paper';
+import { useThemeContext } from '@/context/ThemeContext';
 
 interface EmptyProps {
   title: string;
   description?: string;
   buttonTitle?: string;
   onPress?: () => void;
+  icon?: React.ReactNode;
 }
 
-const Empty: React.FC<EmptyProps> = ({ title, description, onPress, buttonTitle }) => {
-  const { height } = useWindowDimensions();
-
+const Empty: React.FC<EmptyProps> = ({ title, description, onPress, buttonTitle, icon }) => {
+  const { theme } = useThemeContext();
   return (
-    <Container height={height - 200} alignItems="center" justifyContent="center">
-      <Stack direction="column" gap={2} align="center">
-        <EmptyIcon />
-        <Spacer x={1} y={1} />
+    <Container width="100%" alignItems="center">
+      <EmptyCard>
         <Stack direction="column" gap={1} align="center">
-          <Typography variant="h3" weight={600}>
-            {title}
-          </Typography>
-          <Typography variant="body2" color="textSecondary" align="center">
-            {description}
-          </Typography>
-          {buttonTitle && (
-            <>
-              <Spacer x={1} y={1} />
-              <StyledButton mode="contained" onPress={onPress}>
-                {buttonTitle}
-              </StyledButton>
-            </>
-          )}
+          {icon || <EmptyIcon />}
+          <Stack direction="column" gap={1} align="center">
+            <Typography variant="h3" weight={600} color={theme.colors.text.primary}>
+              {title}
+            </Typography>
+            {description && (
+              <Typography variant="body2" color={theme.colors.text.primary} align="center">
+                {description}
+              </Typography>
+            )}
+            {buttonTitle && (
+              <>
+                <Spacer x={1} y={1} />
+                <StyledButton mode="contained" onPress={onPress} theme={theme}>
+                  {buttonTitle}
+                </StyledButton>
+              </>
+            )}
+          </Stack>
         </Stack>
-      </Stack>
+      </EmptyCard>
     </Container>
   );
 };
@@ -52,6 +56,18 @@ const Container = styled(Box)`
   top: 0;
   width: 100%; */
 `;
+
+const EmptyCard = styled(Stack)(({ theme }) => ({
+  marginBottom: 16,
+  position: 'relative',
+  backgroundColor: theme.colors.background.secondary,
+  borderRadius: theme.borderRadius.xl,
+  padding: 24,
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '100%',
+  maxWidth: 400,
+}));
 
 const StyledButton = styled(Button)`
   width: 100%;

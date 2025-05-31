@@ -25,6 +25,7 @@ const Header = ({
 }: HeaderProps) => {
   const { theme } = useThemeContext();
   const user = useSelector((state: any) => state.auth.user);
+
   const handleBackPress = () => {
     if (navigateLink) {
       navigate(navigateLink, {});

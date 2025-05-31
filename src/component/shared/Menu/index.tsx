@@ -48,6 +48,10 @@ const Menu = ({
         <TouchableWithoutFeedback onPress={toggleMenu}>
           <View
             onStartShouldSetResponder={(event: any) => true}
+            style={{
+              padding: 8,
+              borderRadius: theme.borderRadius.round,
+            }}
             onTouchEnd={(e: any) => {
               e.stopPropagation();
             }}>

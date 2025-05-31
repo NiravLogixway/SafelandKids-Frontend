@@ -11,6 +11,8 @@ import {
   ControlsButton,
 } from './styles';
 import ProgressBar from './ProgressBar';
+import { useThemeContext } from '@/context/ThemeContext';
+import Stack from '../Stack';
 
 interface IframeOverlayProps {
   videoThumbnail: string;
@@ -26,6 +28,8 @@ interface IframeOverlayProps {
   onOverlayPress: () => void;
   onMoveBackVideo: () => void;
   onMoveNextVideo: () => void;
+  onBack: () => void;
+  isShowBack?: boolean;
 }
 
 const IframeOverlay: React.FC<IframeOverlayProps> = ({
@@ -42,7 +46,10 @@ const IframeOverlay: React.FC<IframeOverlayProps> = ({
   onOverlayPress,
   onMoveBackVideo,
   onMoveNextVideo,
+  onBack,
+  isShowBack,
 }) => {
+  const { theme } = useThemeContext()
   return (
     <Overlay pointerEvents="box-none">
       <TouchableWithoutFeedback onPress={onOverlayPress}>
@@ -55,6 +62,9 @@ const IframeOverlay: React.FC<IframeOverlayProps> = ({
             {overlayVisible && (
               <>
                 <OverlayHeader>
+                  {isShowBack && <ControlsButton onPress={onBack}>
+                    <Icon name="arrow-back" size={24} color="#fff" />
+                  </ControlsButton>}
                   <Thumbnail source={{ uri: videoThumbnail }} />
                   <TitleText numberOfLines={1}>{videoTitle}</TitleText>
                 </OverlayHeader>
@@ -77,11 +87,14 @@ const IframeOverlay: React.FC<IframeOverlayProps> = ({
             {overlayVisible && (
               <>
                 <OverlayHeader>
+                  {isShowBack && <ControlsButton onPress={onBack}>
+                    <Icon name="arrow-back" size={24} color="#fff" />
+                  </ControlsButton>}
                   <Thumbnail source={{ uri: videoThumbnail }} />
                   <TitleText numberOfLines={1}>{videoTitle}</TitleText>
                 </OverlayHeader>
                 <ControlsContainer direction="row" align="center" justify="space-between" gap={3}>
-                    <ControlsButton onPress={onMoveBackVideo}>
+                  <ControlsButton onPress={onMoveBackVideo}>
                     <Icon name="rotate-left" size={30} color="#fff" />
                   </ControlsButton>
                   <PlayPauseButton onPress={onPlayPause} activeOpacity={0.8}>

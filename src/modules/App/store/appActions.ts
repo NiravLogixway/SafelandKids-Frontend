@@ -1,7 +1,12 @@
 import * as appTypes from './appTypes';
 
-export const getKids = () => ({
+export const getKids = (
+  resolve?: (value: unknown) => void,
+  reject?: (reason?: any) => void,
+) => ({
   type: appTypes.GET_CHILDS,
+  resolve,
+  reject,
 });
 
 export const setKids = (kids: appTypes.Kid[]) => ({
@@ -94,4 +99,8 @@ export const deletePlaylist = (
   data: playlist,
   resolve,
   reject,
+});
+
+export const removeState = () => ({
+  type: appTypes.REMOVE_STATE,
 });

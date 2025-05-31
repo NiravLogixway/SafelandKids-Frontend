@@ -5,7 +5,7 @@ import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 import { useTabNavigationGuard } from '@/hooks/useTabNavigationGuard';
 import { useDispatch } from 'react-redux';
 import { getItem } from '@/utils/localstorage';
-import { navigate } from './NavigationService';
+import { navigate, navigateToNestedScreen } from './NavigationService';
 import * as appActions from '@/modules/App/store/appActions';
 import { bottomNavigationsTab } from './constants/tabMenus';
 
@@ -38,6 +38,7 @@ const HomeNav = () => {
 
   return (
     <HomeStack.Navigator
+      initialRouteName="ChildList"
       screenOptions={{
         headerShown: false,
         gestureDirection: 'horizontal',
@@ -48,6 +49,9 @@ const HomeNav = () => {
       <HomeStack.Screen
         name="ChildList"
         component={Home}
+        options={{
+          gestureEnabled: false,
+        }}
       />
       <HomeStack.Screen
         name="ChildVideoPlaylist"
@@ -75,6 +79,10 @@ const HomeNav = () => {
         component={Passcode}
         initialParams={{ kid: undefined }}
       />
+      <ChildStack.Screen
+        name="ChildPlaylist"
+        component={AddChildPlaylists}
+      />
     </HomeStack.Navigator>
   );
 };
@@ -84,6 +92,7 @@ const ChildNav = () => {
 
   return (
     <ChildStack.Navigator
+      initialRouteName="ChildForm"
       screenOptions={{
         headerShown: false,
         gestureDirection: 'horizontal',
@@ -97,10 +106,6 @@ const ChildNav = () => {
         initialParams={{ mode: 'add', kid: undefined }}
 
       />
-      <ChildStack.Screen
-        name="ChildPlaylist"
-        component={AddChildPlaylists}
-      />
     </ChildStack.Navigator>
   );
 };
@@ -110,6 +115,7 @@ const ProfileNav = () => {
 
   return (
     <ProfileStack.Navigator
+      initialRouteName="Profile"
       screenOptions={{
         headerShown: false,
         gestureDirection: 'horizontal',
@@ -129,20 +135,20 @@ const ProfileNav = () => {
   );
 };
 
-const getTabListeners = (isChildMode: boolean, handleTabPress: () => void) => ({
-  tabPress: (e: any) => {
-    if (isChildMode) {
-      e.preventDefault();
-      handleTabPress();
-    }
-  },
-});
-
 const AppNavigator: React.FC<{ screenOptions?: NativeStackNavigationOptions }> = (props) => {
   const dispatch = useDispatch();
   const { isTabBarVisible } = useTabContext();
   const { handleTabPress, isChildMode } = useTabNavigationGuard();
   const { theme } = useThemeContext();
+
+  const handleTabNavigation = (routeName: string, screen: string) => {
+    if (isChildMode) {
+      handleTabPress();
+    } else {
+      navigateToNestedScreen(routeName, screen, {});
+    }
+  };
+
   useEffect(() => {
     getItem('CURRENT_KID').then((currentKid) => {
       if (currentKid) {
@@ -154,6 +160,17 @@ const AppNavigator: React.FC<{ screenOptions?: NativeStackNavigationOptions }> =
 
   return (
     <Tab.Navigator
+      detachInactiveScreens={false}
+      screenListeners={{
+        tabPress: (e) => {
+          e.preventDefault();
+          const route = e.target?.split('-')[0] as keyof MainTab;
+          const screen = bottomNavigationsTab[route]?.initialScreen;
+          if (route) {
+            handleTabNavigation(route, screen);
+          }
+        },
+      }}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color }) => {
           const Icon = bottomNavigationsTab[route.name]?.icon;
@@ -183,17 +200,14 @@ const AppNavigator: React.FC<{ screenOptions?: NativeStackNavigationOptions }> =
       <Tab.Screen
         name="Home"
         component={HomeNav}
-        listeners={getTabListeners(isChildMode, handleTabPress)}
       />
       <Tab.Screen
         name="Child"
         component={ChildNav}
-        listeners={getTabListeners(isChildMode, handleTabPress)}
       />
       <Tab.Screen
         name="Profile"
         component={ProfileNav}
-        listeners={getTabListeners(isChildMode, handleTabPress)}
       />
     </Tab.Navigator>
   );

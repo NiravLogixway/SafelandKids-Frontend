@@ -111,6 +111,7 @@ export const CombinedDefaultTheme = {
   dark: false,
   colors: {
     ...NavigationDefaultTheme.colors,
+    mainBg: '#ffffff',
     primary: '#DD0A1D',
     onPrimary: 'rgb(255, 255, 255)',
     primaryContainer: 'rgb(255, 218, 214)',
@@ -150,6 +151,7 @@ export const CombinedDefaultTheme = {
       default: NavigationDefaultTheme.colors.background,
       primary: '#ffffff',
       secondary: '#7A28FC',
+      dark: '#000000',
       gradient: {
         primary: {
           colors: ['rgba(232, 93, 4, 1)', 'rgba(250, 140, 70, 1)'],
@@ -203,7 +205,7 @@ export const CombinedDarkTheme = {
   dark: true,
   colors: {
     ...NavigationDarkTheme.colors,
-    mainBg: 'rgb(46, 46, 46)',
+    mainBg: '#000000',
     headerBg: 'rgb(46, 46, 46)',
     headerShadow: '#000000',
     bottomNavigationBg: '#1E293B',
@@ -267,6 +269,7 @@ export const CombinedDarkTheme = {
       default: NavigationDefaultTheme.colors.background,
       primary: '#ffffff',
       secondary: '#7A28FC',
+      dark: '#000000',
       gradient: {
         primary: {
           colors: ['rgba(232, 93, 4, 1)', 'rgba(250, 140, 70, 1)'],

@@ -26,12 +26,15 @@ export default (
       return {
         ...state,
         currentKid: payload.data,
+        ...(!payload.data ? {playlists: []} : {}),
       };
     case appTypes.SET_PLAYLISTS:
       return {
         ...state,
         playlists: payload.data,
       };
+    case appTypes.REMOVE_STATE:
+      return initialState;
     default:
       return state;
   }

@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { fetchYoutubeOEmbed } from '@/modules/App/api/appApi';
 import Clipboard from '@react-native-clipboard/clipboard';
+import Empty from '@/component/app/Empty';
 import {
   StyledGradientButton,
   IconCircle,
@@ -27,6 +28,7 @@ import toast from '@/utils/toast';
 import { useDispatch, useSelector } from 'react-redux';
 import * as appActions from '@/modules/App/store/appActions';
 import { RootState } from '@/store';
+import Spinner from '@/component/shared/Spinner';
 
 interface VideoProps {
   id?: number;
@@ -84,11 +86,11 @@ const VideoLinkInput: React.FC<VideoLinkInputProps> = ({ value, onPaste, onRemov
           </Typography>
         </VideoLinkInputFlex>
       </VideoLinkInputWrapper>
-      {onRemove && (
+      {/* {onRemove && (
         <VideoLinkRemoveButton onPress={onRemove}>
           <Icon name="close" size={24} color={theme.colors.text.primary} />
         </VideoLinkRemoveButton>
-      )}
+      )} */}
       {error && (
         <Typography variant="body2" color={theme.colors.error} style={{ marginTop: theme.spacing.sm }}>
           {error}
@@ -120,12 +122,13 @@ const VideoPreviewCard: React.FC<VideoPreviewCardProps> = ({ title, thumbnail, o
   );
 };
 
-const GradientButton = ({ onPress, children, disabled, loading, iconName, borderRadius, textColor }: { onPress: () => void, children: React.ReactNode, disabled?: boolean, loading?: boolean, iconName: string, borderRadius?: number, textColor?: string }) => {
+const GradientButton = ({ onPress, children, disabled, loading, iconName, borderRadius, textColor, showLoading }: { onPress: () => void, children: React.ReactNode, disabled?: boolean, loading?: boolean, iconName: string, borderRadius?: number, textColor?: string, showLoading?: boolean }) => {
   const { theme } = useThemeContext();
   return (
     <GradientButtonTouchable
       onPress={onPress}
       disabled={disabled || loading}
+      style={{ opacity: loading ? 0.7 : 1 }}
     >
       <StyledGradientButton
         colors={theme.colors.background.gradient.primary.colors}
@@ -134,7 +137,7 @@ const GradientButton = ({ onPress, children, disabled, loading, iconName, border
         borderRadius={borderRadius}
       >
         <IconCircle>
-          {loading ? (
+          {loading && showLoading ? (
             <Icon name="hourglass-empty" size={24} color="#fff" />
           ) : (
             <Icon name={iconName} size={24} color="#fff" />
@@ -188,6 +191,7 @@ const AddChildPlaylists = (props: any) => {
       getChildPlaylists()
     }
     return () => {
+      setVideos([])
       dispatch(appActions.setPlaylists([]))
     }
   }, [kid.id]);
@@ -343,10 +347,29 @@ const AddChildPlaylists = (props: any) => {
     setLoading(false);
   };
 
+  const renderEmptyState = () => {
+    if (loading) {
+      return (
+        <Stack align="center" justify="center" style={{ padding: theme.spacing.lg }}>
+          <Spinner size="small" color={theme.colors.text.primary} />
+        </Stack>
+      )
+    }
+    if (videos.length === 0) {
+      return (
+        <Stack align="center" justify="center" style={{ padding: theme.spacing.lg }}>
+          <Empty title="No Playlist Videos" icon={<MaterialCommunityIcons name="playlist-plus" size={40} color={theme.colors.text.primary} />} />
+        </Stack>
+      )
+    }
+    return null;
+  }
+
   return (
     <AppLayout isBack title={childName}>
       {mode === 'input' ? (
         <>
+          {videos.length === 0 && renderEmptyState()}
           <ScrollView contentContainerStyle={{ flexGrow: 1, padding: theme.spacing.lg }}>
             {videos.map((video, idx) => (
               <VideoLinkInput
@@ -359,16 +382,17 @@ const AddChildPlaylists = (props: any) => {
             ))}
           </ScrollView>
           <Stack direction="row" gap={2} mb={theme.spacing.xs} style={{ marginTop: 'auto', paddingTop: theme.spacing.md }}>
-            <GradientButton onPress={handleAddMore} iconName="add">
+            <GradientButton onPress={handleAddMore} iconName="add" loading={loading}>
               Add more
             </GradientButton>
-            <GradientButton onPress={handleDone} iconName="check" disabled={!videos.some(v => v.url.trim())} loading={loading}>
+            <GradientButton onPress={handleDone} iconName="check" disabled={!videos.some(v => v.url.trim())} loading={loading} showLoading>
               Done
             </GradientButton>
           </Stack>
         </>
       ) : (
         <>
+          {videos.length === 0 && renderEmptyState()}
           <ScrollView contentContainerStyle={{ flexGrow: 1, padding: theme.spacing.lg }}>
             {videos.map((video, idx) => (
               <VideoPreviewCard
@@ -381,14 +405,16 @@ const AddChildPlaylists = (props: any) => {
               />
             ))}
           </ScrollView>
-          <Stack direction="row" gap={2} mb={theme.spacing.xs} style={{ marginTop: 'auto' }}>
-            <GradientButton onPress={() => setMode('input')} iconName="add">
-              Add Video Link(s)
-            </GradientButton>
-            <GradientButton onPress={handleFinish} iconName="check" loading={loading}>
-              Finish
-            </GradientButton>
-          </Stack>
+          {videos.length > 0 && (
+            <Stack direction="row" gap={2} mb={theme.spacing.xs} style={{ marginTop: 'auto' }}>
+              <GradientButton onPress={() => setMode('input')} iconName="add" loading={loading}>
+                Add Video Link(s)
+              </GradientButton>
+              <GradientButton onPress={handleFinish} iconName="check" loading={loading} showLoading>
+                Finish
+              </GradientButton>
+            </Stack>
+          )}
         </>
       )}
     </AppLayout>

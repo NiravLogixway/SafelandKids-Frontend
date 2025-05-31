@@ -11,6 +11,7 @@ import {
 import Stack from '../Stack';
 import IframeOverlay from './IframeOverlay';
 import Typography from '../Typography';
+import { navigationRef } from '@/navigation/NavigationService';
 
 interface YouTubeWebViewProps {
   video: any;
@@ -24,16 +25,18 @@ interface YouTubeWebViewProps {
   onPause?: () => void;
   onSeek?: (e: any) => void;
   onProgress?: (state: string, player: YoutubeIframeRef) => void;
+  isShowBack?: boolean;
 }
 
 interface CustomYoutubeIframeRef extends YoutubeIframeRef {
   video?: any;
+  play?: () => void;
 }
 
 let timerInterval: NodeJS.Timeout;
 let hideOverlayTimeout: NodeJS.Timeout;
 
-const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTitle, videoThumbnail, watchDuration, autoPlay = true, onEnd, onPlay, onPause, onSeek, onProgress }) => {
+const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTitle, videoThumbnail, watchDuration, autoPlay = true, onEnd, onPlay, onPause, onSeek, onProgress, isShowBack }) => {
   const playerRef = useRef<CustomYoutubeIframeRef>(null);
   const [playing, setPlaying] = useState(autoPlay);
   const [currentTime, setCurrentTime] = useState(0);
@@ -49,6 +52,9 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTit
       const currentRef = playerRef.current;
       playerRef.current = { ...currentRef, video };
     }
+    // Reset progress bar state when video changes
+    setCurrentTime(0);
+    setPlaying(autoPlay);
   }, [videoId]);
 
   const orientationChangeHandler = (orientation: string) => {
@@ -57,7 +63,6 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTit
 
   useEffect(() => {
     if (hideOverlayTimeout) clearTimeout(hideOverlayTimeout);
-    Orientation.lockToPortrait();
     Orientation.addOrientationListener(orientationChangeHandler);
     return () => {
       Orientation.removeOrientationListener(orientationChangeHandler);
@@ -119,6 +124,12 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTit
 
   const togglePlaying = () => {
     setPlaying(p => !p);
+    if (videoEnded) {
+      if (playerRef.current && typeof playerRef.current.seekTo === 'function') {
+        playerRef.current.seekTo(0, true);
+        setCurrentTime(0);
+      }
+    }
   };
 
   const handleSeek = async (e: any) => {
@@ -150,6 +161,7 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTit
     }
     if (state === 'ended') {
       onEnd?.();
+      setPlaying(false);
     } else if (state === 'playing') {
       onPlay?.();
     } else if (state === 'paused') {
@@ -235,6 +247,10 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTit
                 onOverlayPress={showOverlay}
                 onMoveBackVideo={handleMoveBackVideo}
                 onMoveNextVideo={handleMoveNextVideo}
+                isShowBack={isShowBack}
+                onBack={() => {
+                  navigationRef.current?.goBack();
+                }}
               />
             </Stack>
           </Container>

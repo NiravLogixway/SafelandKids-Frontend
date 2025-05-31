@@ -13,15 +13,18 @@ interface User {
 
 const getUser = (state: RootState) => state.auth.user;
 
-function* getKids(): Generator<any, void, any> {
+function* getKids(action: appTypes.GetKidsAction): Generator<any, void, any> {
+  const {resolve, reject} = action;
   try {
     const user = (yield select(getUser)) as User;
     const response = yield call(appApi.getKidsList, user.id);
     if (Array.isArray(response)) {
       yield put(appActions.setKids(response));
     }
+    if (resolve) resolve(response);
   } catch (error) {
     console.error('Error in getKids saga:', error);
+    if (reject) reject(error);
   }
 }
 
@@ -36,7 +39,7 @@ function* addKid(action: appTypes.AddKidAction): Generator<any, void, any> {
     };
     const response = yield call(appApi.addKid, payload);
     if (response?.data?.id) {
-      yield call(getKids);
+      yield put(appActions.getKids(undefined, undefined));
       navigate('Home', {});
       toast.success('Child added successfully');
       action.resolve(response.data);
@@ -57,7 +60,12 @@ function* updateKid(
     const kid = action.data;
     const response = yield call(appApi.updateKid as any, kid.id, {data: kid});
     if (response?.data?.id) {
-      yield call(getKids);
+      yield put(
+        appActions.getKids(
+          () => {},
+          () => {},
+        ),
+      );
       navigate('Home', {});
       toast.success('Child updated successfully');
       action.resolve(response.data);
@@ -77,7 +85,7 @@ function* deleteKid(
   try {
     const response = yield call(appApi.deleteKid as any, action.data.id);
     if (response?.data?.id) {
-      yield call(getKids);
+      yield put(appActions.getKids());
       toast.success('Child deleted successfully');
       action.resolve(response.data);
     } else {
@@ -114,7 +122,7 @@ function* addPlaylist(
     const response = yield call(appApi.addPlaylist as any, action.data);
     if (response?.success) {
       toast.success('Playlist added successfully');
-      yield call(getKids);
+      yield put(appActions.getKids());
       navigate('Home', {});
       action.resolve(response);
     } else {

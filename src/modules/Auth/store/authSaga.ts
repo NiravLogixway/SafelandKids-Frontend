@@ -1,6 +1,7 @@
 import {all, fork, put, call, takeLatest} from 'redux-saga/effects';
 import * as authTypes from './authTypes';
 import * as authActions from './authActions';
+import * as appActions from '@/modules/App/store/appActions';
 import * as authApi from '../api/authApi';
 import toast from '@/utils/toast';
 import {LoginPayload} from './authTypes';
@@ -81,6 +82,11 @@ function* updateUserProfile({
     } else {
       reject(res.message);
     }
+    toast.success(
+      res.message || res.blocked
+        ? 'User deleted successfully'
+        : 'Profile updated successfully',
+    );
   } catch (error: any) {
     toast.error(error.error?.message || 'Something went wrong!!');
     reject(error);
@@ -93,6 +99,7 @@ function* handleLogout(): Generator<any, void, any> {
   try {
     yield call(removeItem, 'AUTH_TOKEN');
     yield call(removeItem, 'CURRENT_KID');
+    yield put(appActions.removeState());
     yield put(authActions.removeAuthUser());
     setTimeout(() => {
       navigate('Login', {});
