@@ -66,7 +66,7 @@ const PasscodeForm = () => {
                   Enter Passcode
                 </Typography>
                 <Stack gap={2} style={{ marginBottom: 12 }}>
-                  <Form.Field.OtpInput name="passcode" pinCount={4} bgColor={theme.colors.background.primary} color={theme.colors.text.textDrakBlack} />
+                  <Form.Field.OtpInput name="passcode" pinCount={4} bgColor={theme.colors.background.primary} color={theme.colors.text.textDrakBlack} errorColor={theme.colors.errorLightText} />
                 </Stack>
                 <GradientBackground colors={theme.colors.background.gradient.primary.colors} theme={theme}>
                   <UpdateButtonContainer loading={loading} onPress={() => handleSubmit()}>
@@ -100,13 +100,13 @@ const PasscodeForm = () => {
                   Update Passcode
                 </Typography>
                 <Stack gap={2} style={{ marginBottom: 12 }}>
-                  <Form.Field.OtpInput name="passcode" pinCount={4} bgColor={theme.colors.background.primary} color={theme.colors.text.textDrakBlack} />
+                  <Form.Field.OtpInput name="passcode" pinCount={4} bgColor={theme.colors.background.primary} color={theme.colors.text.textDrakBlack} errorColor={theme.colors.errorLightText} />
                 </Stack>
                 <Typography variant="h5" weight={500} color="primary" align="center" style={{ marginBottom: 8 }}>
                   Confirm Passcode
                 </Typography>
                 <Stack gap={2} style={{ marginBottom: 16 }}>
-                  <Form.Field.OtpInput name="confirmPasscode" pinCount={4} bgColor={theme.colors.background.primary} color={theme.colors.text.textDrakBlack} />
+                  <Form.Field.OtpInput name="confirmPasscode" pinCount={4} bgColor={theme.colors.background.primary} color={theme.colors.text.textDrakBlack} errorColor={theme.colors.errorLightText} />
                 </Stack>
                 <GradientBackground colors={theme.colors.background.gradient.primary.colors} theme={theme}>
                   <UpdateButtonContainer loading={loading} onPress={() => handleSubmit()}>

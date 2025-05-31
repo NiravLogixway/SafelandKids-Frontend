@@ -48,7 +48,7 @@ export const AddKidButton = styled(Box)(({theme}) => ({
   borderRadius: theme.borderRadius.xl,
   paddingBlock: theme.spacing.md,
   marginHorizontal: theme.spacing.lg,
-  marginBottom: theme.spacing.lg,
+  marginBottom: theme.spacing.xs,
 }));
 
 export const AddKidText = styled.Text(({theme}) => ({

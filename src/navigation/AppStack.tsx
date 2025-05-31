@@ -104,7 +104,6 @@ const ChildNav = () => {
         name="ChildForm"
         component={ChildForm}
         initialParams={{ mode: 'add', kid: undefined }}
-
       />
     </ChildStack.Navigator>
   );

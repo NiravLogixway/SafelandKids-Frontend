@@ -143,7 +143,7 @@ const Home = () => {
             <GradientBackground colors={theme.colors.background.gradient.primary.colors} theme={theme}>
               <Icon name="add" size={24} color={theme.colors.text.primary} />
             </GradientBackground>
-            <Typography variant="body1" weight={500}>Add Kid(s)</Typography>
+            <Typography variant="body1" weight={600} color={theme.colors.text.primary}>Add Kid(s)</Typography>
           </TouchableOpacity>
         </AddKidButton>
       </HomeContainer>

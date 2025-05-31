@@ -1,5 +1,5 @@
 import AuthLayout from '@/layouts/AuthLayout'
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { RegisterContainer, StyledInput, RegisterButtonContainer, GradientBackground, RegisterButtonText, RegisterText, TermsText, LinkText } from './style'
 import { useThemeContext } from '@/context/ThemeContext';
 import Form from '@/component/shared/Form';
@@ -9,6 +9,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { register } from '../../store/authActions';
 import { useDispatch } from 'react-redux';
 import { Linking, Pressable, Text } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
 const validationSchema = Yup.object().shape({
   firstName: Yup.string().required('First name is required'),
@@ -23,6 +24,7 @@ const Register = () => {
   const dispatch = useDispatch();
   const { theme } = useThemeContext();
   const [isLoading, setIsLoading] = useState(false);
+  const registerFormRef = useRef<any>(null);
 
   const initialValues = {
     firstName: '',
@@ -42,6 +44,12 @@ const Register = () => {
     });
   };
 
+  useFocusEffect(
+    React.useCallback(() => {
+      registerFormRef.current?.resetForm();
+    }, [])
+  );
+
   return (
     <AuthLayout isBack title="Register">
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1 }}>
@@ -55,24 +63,27 @@ const Register = () => {
             onSubmit={handleSubmit}
             validateOnChange={false}
           >
-            {({ handleSubmit }: any) => (
-              <>
-                <StyledInput name="firstName" placeholder="FirstName" />
-                <StyledInput name="lastName" placeholder="LastName" />
-                <StyledInput name="email" placeholder="E-mail" />
-                <Stack direction="row" align='center' justify='space-between' style={{ width: "100%", marginTop: 8 }}>
-                  <RegisterText variant="h3" >Passcode</RegisterText>
-                  <Form.Field.OtpInput name="passcode" pinCount={4} />
-                </Stack>
-                <StyledInput name="username" placeholder="UserName" />
-                <Form.Field.PasswordInput name="password" placeholder="Password" />
-                <GradientBackground colors={theme.colors.background.gradient.primary.colors} theme={theme}>
-                  <RegisterButtonContainer loading={isLoading} onPress={handleSubmit}>
-                    <RegisterButtonText>Create Button</RegisterButtonText>
-                  </RegisterButtonContainer>
-                </GradientBackground>
-              </>
-            )}
+            {(formikProps: any) => {
+              registerFormRef.current = formikProps;
+              return (
+                <>
+                  <StyledInput name="firstName" placeholder="FirstName" />
+                  <StyledInput name="lastName" placeholder="LastName" />
+                  <StyledInput name="email" placeholder="E-mail" />
+                  <Stack direction="row" align='center' justify='space-between' style={{ width: "100%", marginTop: 8 }}>
+                    <RegisterText variant="h3" >Passcode</RegisterText>
+                    <Form.Field.OtpInput name="passcode" pinCount={4} />
+                  </Stack>
+                  <StyledInput name="username" placeholder="UserName" />
+                  <Form.Field.PasswordInput name="password" placeholder="Password" />
+                  <GradientBackground colors={theme.colors.background.gradient.primary.colors} theme={theme}>
+                    <RegisterButtonContainer loading={isLoading} onPress={formikProps.handleSubmit}>
+                      <RegisterButtonText>Create Button</RegisterButtonText>
+                    </RegisterButtonContainer>
+                  </GradientBackground>
+                </>
+              );
+            }}
           </Form>
           <TermsText variant='h5'>
             By click in Register you agree to our{' '}

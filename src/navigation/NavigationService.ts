@@ -28,6 +28,13 @@ export function navigateToNestedScreen(
   );
 }
 
+export function resetToScreen(name: string, params: any) {
+  navigationRef.current?.reset({
+    index: 0,
+    routes: [{name, params}],
+  });
+}
+
 export function goBackWithDispatch() {
   if (navigationRef.current) {
     navigationRef.current.dispatch(CommonActions.goBack());

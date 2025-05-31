@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import AuthLayout from '@/layouts/AuthLayout';
 import Form from '@/component/shared/Form';
 import { useThemeContext } from '@/context/ThemeContext';
@@ -17,6 +17,7 @@ import * as Yup from 'yup';
 import { navigate } from '@/navigation/NavigationService';
 import { useDispatch } from 'react-redux';
 import { login } from '../../store/authActions';
+import { useFocusEffect } from '@react-navigation/native';
 
 // Validation schema
 const validationSchema = Yup.object().shape({
@@ -32,6 +33,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const { theme } = useThemeContext();
   const [isLoading, setIsLoading] = useState(false);
+  const loginFormRef = useRef<any>(null);
 
   const initialValues = {
     identifier: '',
@@ -47,6 +49,12 @@ const Login = () => {
     });
   };
 
+  useFocusEffect(
+    React.useCallback(() => {
+      loginFormRef.current?.resetForm();
+    }, [])
+  );
+
   return (
     <AuthLayout title="Login">
       <LoginContainer>
@@ -55,30 +63,33 @@ const Login = () => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ handleSubmit }: any) => (
-            <>
-              <StyledInput
-                name="identifier"
-                placeholder="Email"
-              />
-              <Form.Field.PasswordInput
-                name="password"
-                placeholder="Password"
-              />
-              <ForgotPasswordText
-                onPress={() => {
-                  navigate('ForgetPassword', {});
-                }}
-              >
-                Forgot password?
-              </ForgotPasswordText>
-              <GradientBackground colors={theme.colors.background.gradient.primary.colors} theme={theme}>
-                <LoginButtonContainer loading={isLoading} onPress={handleSubmit}>
-                  <LoginButtonText>Login</LoginButtonText>
-                </LoginButtonContainer>
-              </GradientBackground>
-            </>
-          )}
+          {(formikProps: any) => {
+            loginFormRef.current = formikProps;
+            return (
+              <>
+                <StyledInput
+                  name="identifier"
+                  placeholder="Email"
+                />
+                <Form.Field.PasswordInput
+                  name="password"
+                  placeholder="Password"
+                />
+                <ForgotPasswordText
+                  onPress={() => {
+                    navigate('ForgetPassword', {});
+                  }}
+                >
+                  Forgot password?
+                </ForgotPasswordText>
+                <GradientBackground colors={theme.colors.background.gradient.primary.colors} theme={theme}>
+                  <LoginButtonContainer loading={isLoading} onPress={formikProps.handleSubmit}>
+                    <LoginButtonText>Login</LoginButtonText>
+                  </LoginButtonContainer>
+                </GradientBackground>
+              </>
+            );
+          }}
         </Form>
 
         <RegisterContainer>

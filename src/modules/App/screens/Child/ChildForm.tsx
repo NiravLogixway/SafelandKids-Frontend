@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import AppLayout from '@/layouts/AppLayout';
-import { useRoute, RouteProp } from '@react-navigation/native';
+import { RouteProp, useFocusEffect } from '@react-navigation/native';
 import type { ChildStack, MainTab } from '@/navigation/AppStack';
 import { useThemeContext } from '@/context/ThemeContext';
 import { FormContainer } from '@/component/shared/Form/style';
@@ -33,6 +33,13 @@ const ChildForm = (props: any) => {
   const dispatch = useDispatch();
   const { theme } = useThemeContext();
   const [loader, setLoader] = useState(false);
+  const childFormRef = useRef<any>(null);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      childFormRef.current?.resetForm();
+    }, [])
+  );
 
   const handleSubmit = async (values: ChildData, { resetForm }: ChildFormHelpers) => {
     setLoader(true);
@@ -70,22 +77,25 @@ const ChildForm = (props: any) => {
             })}
             enableReinitialize
             onSubmit={handleSubmit}>
-            {({ handleSubmit }: any) => (
-              <>
-                <StyledInput name="firstName" placeholder="First Name" />
-                <StyledInput name="lastName" placeholder="Last Name" />
-                <StyledInput
-                  name="age"
-                  placeholder="Age"
-                  keyboardType="numeric"
-                />
-                <GradientBackground colors={theme.colors.background.gradient.primary.colors} theme={theme}>
-                  <UpdateButtonContainer loading={loader} onPress={handleSubmit}>
-                    <UpdateButtonText>{isEdit ? 'Update' : 'Add'} Child</UpdateButtonText>
-                  </UpdateButtonContainer>
-                </GradientBackground>
-              </>
-            )}
+            {(formikProps: any) => {
+              childFormRef.current = formikProps;
+              return (
+                <>
+                  <StyledInput name="firstName" placeholder="First Name" />
+                  <StyledInput name="lastName" placeholder="Last Name" />
+                  <StyledInput
+                    name="age"
+                    placeholder="Age"
+                    keyboardType="numeric"
+                  />
+                  <GradientBackground colors={theme.colors.background.gradient.primary.colors} theme={theme}>
+                    <UpdateButtonContainer loading={loader} onPress={formikProps.handleSubmit}>
+                      <UpdateButtonText>{isEdit ? 'Update' : 'Add'} Child</UpdateButtonText>
+                    </UpdateButtonContainer>
+                  </GradientBackground>
+                </>
+              );
+            }}
           </Form>
         </FormContainer>
       </ScrollView>
