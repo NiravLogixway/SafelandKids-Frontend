@@ -84,6 +84,7 @@ declare module 'styled-components/native' {
       background: {
         default: string;
         secondary: string;
+        dark: string;
         gradient: {
           primary: {
             colors: string[];

@@ -8,6 +8,12 @@ interface ContainerProps {
   height: number;
 }
 
+interface PlayerOverlayProps {
+  width: number;
+  height: number;
+  isPortrait: boolean;
+}
+
 export const Container = styled(Stack)<ContainerProps>(({width, height}) => ({
   width,
   height,
@@ -95,6 +101,18 @@ export const Overlay = styled.View(() => ({
   alignItems: 'center',
   zIndex: 50,
 }));
+
+export const PlayerOverlay = styled.View<PlayerOverlayProps>(
+  ({width, height, isPortrait, theme}) => ({
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width,
+    height,
+    backgroundColor: isPortrait ? 'transparent' : theme.colors.background.dark,
+    zIndex: 1,
+  }),
+);
 
 export const ControlsContainer = styled(Stack)(() => ({
   position: 'absolute',

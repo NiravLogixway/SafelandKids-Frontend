@@ -95,7 +95,7 @@ const ChildVideoPlayer: React.FC = (props: any) => {
 
   return (
     <AppLayout isBack header={<CustomHeader />}>
-      <Stack style={{ flex: 1, width: '100%', height: '100%', zIndex: 10, backgroundColor: isPortrait ? "transparent" : theme.colors.background.dark }}>
+      <Stack style={{ flex: 1, width: '100%', height: '100%' }}>
         {isLoading ? <ActivityIndicator size="large" color="#fff" /> :
           videoId ? (
             <YouTubePlayer

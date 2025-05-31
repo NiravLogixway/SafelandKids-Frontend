@@ -7,6 +7,8 @@ import {
   Container,
   BackgroundImage,
   PlayerContainer,
+  PlayerOverlay,
+  LoadingOverlay,
 } from './styles';
 import Stack from '../Stack';
 import IframeOverlay from './IframeOverlay';
@@ -45,7 +47,7 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTit
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [videoEnded, setVideoEnded] = useState(false);
   const [isPortrait, setIsPortrait] = useState(true);
-
+  const [dimensions, setDimensions] = useState(Dimensions.get('screen'));
   useEffect(() => {
     // Update playerRef when video changes
     if (playerRef.current && video) {
@@ -61,18 +63,22 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTit
     setIsPortrait(orientation.toLowerCase() === 'portrait');
   };
 
+  const onDimensionsChange = ({ screen }: any) => {
+    setDimensions(screen);
+  };
+
   useEffect(() => {
     if (hideOverlayTimeout) clearTimeout(hideOverlayTimeout);
+    const subscription = Dimensions.addEventListener('change', onDimensionsChange);
     Orientation.addOrientationListener(orientationChangeHandler);
     return () => {
       Orientation.removeOrientationListener(orientationChangeHandler);
+      subscription?.remove();
       if (timerInterval) clearInterval(timerInterval);
       if (hideOverlayTimeout) clearTimeout(hideOverlayTimeout);
     };
   }, []);
 
-  // Calculate player size to fit screen in both orientations
-  const dimensions = Dimensions.get('screen');
   let playerWidth = dimensions.width;
   let playerHeight = dimensions.height;
   const PORTRAIT_ASPECT = 16 / 9;
@@ -190,6 +196,7 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTit
 
   return (
     <PlayerContainer>
+      <PlayerOverlay width={dimensions.width} height={dimensions.height} isPortrait={isPortrait} />
       <BackgroundImage
         source={bg2Image}
         resizeMode="cover"
@@ -197,7 +204,7 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTit
         {videoId ? (
           <Container width={playerWidth} height={playerHeight}>
             <Stack>
-              <View style={{ width: playerWidth, height: playerHeight }} pointerEvents="none">
+              <View style={{ width: playerWidth, height: playerHeight, zIndex: 2 }} pointerEvents="none">
                 <YoutubePlayer
                   key={videoId}
                   ref={playerRef}
@@ -220,19 +227,11 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTit
                 />
               </View>
               {isLoading && (
-                <View style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  backgroundColor: 'rgba(0, 0, 0, 1)',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
+                <LoadingOverlay>
                   <ActivityIndicator size="large" color="#fff" />
-                </View>
+                </LoadingOverlay>
               )}
+
               <IframeOverlay
                 videoThumbnail={videoThumbnail}
                 videoTitle={videoTitle}

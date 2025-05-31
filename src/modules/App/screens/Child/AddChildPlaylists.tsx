@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import AppLayout from '@/layouts/AppLayout';
 import { useThemeContext } from '@/context/ThemeContext';
 import Typography from '@/component/shared/Typography';
@@ -163,6 +163,7 @@ const AddChildPlaylists = (props: any) => {
   const { kid } = props.route.params;
   const { theme } = useThemeContext();
   const dispatch = useDispatch();
+  const scrollViewRef = useRef<ScrollView>(null);
   const playlists = useSelector((state: RootState) => state.app.playlists);
   const [videos, setVideos] = useState<VideoProps[]>([]);
   const [mode, setMode] = useState<'input' | 'preview'>('input');
@@ -200,6 +201,9 @@ const AddChildPlaylists = (props: any) => {
     const lastVideo = videos[videos.length - 1];
     if (lastVideo && !lastVideo.url.trim()) {
       setErrors(prev => ({ ...prev, [videos.length - 1]: 'Paste a youtube URL here' }));
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
       return;
     }
     setVideos([...videos, {
@@ -213,6 +217,10 @@ const AddChildPlaylists = (props: any) => {
       order: videos.length + 1,
     }]);
     setErrors(prev => ({ ...prev, [videos.length]: '' }));
+
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 100);
   };
 
   const handleRemove = (idx: number) => {
@@ -235,7 +243,14 @@ const AddChildPlaylists = (props: any) => {
       if (!videoId) {
         error = 'Please paste a valid YouTube video URL';
       }
-      const isDuplicate = videos.some((video, i) => i !== idx && video.url === text);
+
+      // Check for duplicate based on video ID
+      const isDuplicate = videos.some((video, i) => {
+        if (i === idx) return false;
+        const existingVideoId = extractVideoId(video.url);
+        return video.url === text || existingVideoId === videoId;
+      });
+
       if (isDuplicate) {
         error = 'This video has already been added';
       }
@@ -370,7 +385,10 @@ const AddChildPlaylists = (props: any) => {
       {mode === 'input' ? (
         <>
           {videos.length === 0 && renderEmptyState()}
-          <ScrollView contentContainerStyle={{ flexGrow: 1, padding: theme.spacing.lg }}>
+          <ScrollView
+            ref={scrollViewRef}
+            contentContainerStyle={{ flexGrow: 1, padding: theme.spacing.lg }}
+          >
             {videos.map((video, idx) => (
               <VideoLinkInput
                 key={idx}
@@ -406,7 +424,7 @@ const AddChildPlaylists = (props: any) => {
             ))}
           </ScrollView>
           {videos.length > 0 && (
-            <Stack direction="row" gap={2} mb={theme.spacing.xs} style={{ marginTop: 'auto' }}>
+            <Stack direction="row" gap={2} mb={theme.spacing.xs} style={{ marginTop: 'auto', paddingTop: theme.spacing.md }}>
               <GradientButton onPress={() => setMode('input')} iconName="add" loading={loading}>
                 Add Video Link(s)
               </GradientButton>
