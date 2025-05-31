@@ -81,7 +81,15 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
         onResponderMove={handleSeekMove}
         onResponderRelease={handleSeek}
         onResponderTerminate={() => setDragging(false)}
-        style={{ width: '100%', height: 8, position: 'relative' }}
+        style={{
+          width: '100%',
+          height: 40,
+          position: 'relative',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginTop: -12,
+          marginBottom: -12,
+        }}
       >
         <ProgressBarTrack>
           <ProgressBarFill progress={progress} />

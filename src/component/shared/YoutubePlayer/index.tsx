@@ -14,6 +14,7 @@ import Stack from '../Stack';
 import IframeOverlay from './IframeOverlay';
 import Typography from '../Typography';
 import { navigationRef } from '@/navigation/NavigationService';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface YouTubeWebViewProps {
   video: any;
@@ -28,6 +29,7 @@ interface YouTubeWebViewProps {
   onSeek?: (e: any) => void;
   onProgress?: (state: string, player: YoutubeIframeRef) => void;
   isShowBack?: boolean;
+  onOrientationChange?: (orientation: string) => void;
 }
 
 interface CustomYoutubeIframeRef extends YoutubeIframeRef {
@@ -38,7 +40,7 @@ interface CustomYoutubeIframeRef extends YoutubeIframeRef {
 let timerInterval: NodeJS.Timeout;
 let hideOverlayTimeout: NodeJS.Timeout;
 
-const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTitle, videoThumbnail, watchDuration, autoPlay = true, onEnd, onPlay, onPause, onSeek, onProgress, isShowBack }) => {
+const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTitle, videoThumbnail, watchDuration, autoPlay = true, onEnd, onPlay, onPause, onSeek, onProgress, isShowBack, onOrientationChange }) => {
   const playerRef = useRef<CustomYoutubeIframeRef>(null);
   const [playing, setPlaying] = useState(autoPlay);
   const [currentTime, setCurrentTime] = useState(0);
@@ -48,6 +50,7 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTit
   const [videoEnded, setVideoEnded] = useState(false);
   const [isPortrait, setIsPortrait] = useState(true);
   const [dimensions, setDimensions] = useState(Dimensions.get('screen'));
+
   useEffect(() => {
     // Update playerRef when video changes
     if (playerRef.current && video) {
@@ -57,27 +60,42 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTit
     // Reset progress bar state when video changes
     setCurrentTime(0);
     setPlaying(autoPlay);
+    setOverlayVisible(!autoPlay);
   }, [videoId]);
 
   const orientationChangeHandler = (orientation: string) => {
-    setIsPortrait(orientation.toLowerCase() === 'portrait');
+    setIsPortrait(orientation.toLowerCase() === ('portrait'));
+    onOrientationChange?.(orientation);
   };
 
   const onDimensionsChange = ({ screen }: any) => {
     setDimensions(screen);
   };
 
-  useEffect(() => {
+  const cleanup = (subscription: any) => {
+    setPlaying(false);
+    Orientation.removeDeviceOrientationListener(orientationChangeHandler);
+    subscription?.remove();
+    if (timerInterval) clearInterval(timerInterval);
     if (hideOverlayTimeout) clearTimeout(hideOverlayTimeout);
-    const subscription = Dimensions.addEventListener('change', onDimensionsChange);
-    Orientation.addOrientationListener(orientationChangeHandler);
-    return () => {
-      Orientation.removeOrientationListener(orientationChangeHandler);
-      subscription?.remove();
-      if (timerInterval) clearInterval(timerInterval);
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
       if (hideOverlayTimeout) clearTimeout(hideOverlayTimeout);
-    };
-  }, []);
+      setOverlayVisible(true);
+      const subscription = Dimensions.addEventListener('change', onDimensionsChange);
+      Orientation.addDeviceOrientationListener(orientationChangeHandler);
+      Orientation.getOrientation((orientation) => {
+        setIsPortrait(orientation.toLowerCase() === 'portrait');
+        onOrientationChange?.(orientation);
+      });
+
+      return () => {
+        cleanup(subscription);
+      };
+    }, [])
+  );
 
   let playerWidth = dimensions.width;
   let playerHeight = dimensions.height;

@@ -28,6 +28,15 @@ export function navigateToNestedScreen(
   );
 }
 
+export function navigateToScreen(name: string, params: any) {
+  navigationRef.current?.dispatch(
+    CommonActions.navigate({
+      name,
+      params,
+    }),
+  );
+}
+
 export function resetToScreen(name: string, params: any) {
   navigationRef.current?.reset({
     index: 0,

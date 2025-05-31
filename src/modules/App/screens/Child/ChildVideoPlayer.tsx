@@ -11,6 +11,7 @@ import Stack from '@/component/shared/Stack';
 import { ActivityIndicator } from 'react-native-paper';
 import Typography from '@/component/shared/Typography';
 import { useThemeContext } from '@/context/ThemeContext';
+import { useFocusEffect } from '@react-navigation/native';
 
 let timeInterval: NodeJS.Timeout;
 
@@ -41,21 +42,6 @@ const ChildVideoPlayer: React.FC = (props: any) => {
       setTabBarVisible(true);
     }
   };
-
-  useEffect(() => {
-    clearInterval(timeInterval);
-    Orientation.addDeviceOrientationListener(orientationChangeHandler);
-    Orientation.getOrientation((orientation) => {
-      setIsPortrait(orientation.toLowerCase() === 'portrait');
-      setTabBarVisible(orientation.toLowerCase() === 'portrait');
-    });
-    return () => {
-      Orientation.removeDeviceOrientationListener(orientationChangeHandler);
-      clearInterval(timeInterval);
-      setCurrentVideo(null);
-      setTabBarVisible(true);
-    };
-  }, []);
 
   const getYoutubeVideoId = (url: string) => {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
@@ -91,7 +77,7 @@ const ChildVideoPlayer: React.FC = (props: any) => {
     }
   }
 
-  const videoId = getYoutubeVideoId(currentVideo.url);
+  const videoId = currentVideo ? getYoutubeVideoId(currentVideo.url) : null;
 
   return (
     <AppLayout isBack header={<CustomHeader />}>
@@ -119,6 +105,7 @@ const ChildVideoPlayer: React.FC = (props: any) => {
                 }
               }}
               isShowBack={!isPortrait}
+              onOrientationChange={orientationChangeHandler}
             />
           ) : <Stack>
             <Typography>No video found</Typography>
