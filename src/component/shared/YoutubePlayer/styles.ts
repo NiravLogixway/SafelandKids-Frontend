@@ -169,11 +169,12 @@ export const PlayPauseButton = styled.TouchableOpacity(() => ({
   alignItems: 'center',
 }));
 
-export const ProgressBarOuterWrapper = styled.View`
-  width: auto;
-  align-items: center;
-  z-index: 100;
-`;
+export const ProgressBarOuterWrapper = styled.View(({theme}) => ({
+  width: 'auto',
+  alignItems: 'center',
+  zIndex: 100,
+  marginBottom: 16,
+}));
 
 export const ProgressBarTimeRow = styled.View`
   flex-direction: row;

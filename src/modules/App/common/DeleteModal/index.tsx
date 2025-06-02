@@ -3,6 +3,7 @@ import { Modal, Portal, Button, Text } from 'react-native-paper';
 import Box from '@/component/shared/Box';
 import { useThemeContext } from '@/context/ThemeContext';
 import Typography from '@/component/shared/Typography';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface DeleteModalProps {
   visible: boolean;
@@ -24,7 +25,14 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
       <Modal
         visible={visible}
         onDismiss={onCancel}
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: "transparent"
+        }}
         contentContainerStyle={{
+          maxWidth: 500,
           backgroundColor: theme.colors.surface,
           padding: theme.spacing.lg,
           margin: theme.spacing.lg,

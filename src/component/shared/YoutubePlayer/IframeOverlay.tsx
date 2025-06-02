@@ -80,21 +80,19 @@ const IframeOverlay: React.FC<IframeOverlayProps> = ({
                   </PlayPauseButton>
                 </ControlsContainer>
                 <BottomControlsContainer>
-
                   <ProgressBar
                     currentTime={currentTime}
                     duration={duration}
                     onSeek={onSeek}
                     onSeekMove={onSeekMove}
                   />
-
-                  <FullscreenButton onPress={onToggleFullscreen}>
+                  {/* <FullscreenButton onPress={onToggleFullscreen}>
                     <Icon
                       name={isFullscreen ? 'fullscreen-exit' : 'fullscreen'}
                       size={20}
                       color="#fff"
                     />
-                  </FullscreenButton>
+                  </FullscreenButton> */}
                 </BottomControlsContainer>
               </>
             )}
@@ -128,13 +126,13 @@ const IframeOverlay: React.FC<IframeOverlayProps> = ({
                     onSeek={onSeek}
                     onSeekMove={onSeekMove}
                   />
-                  <FullscreenButton onPress={onToggleFullscreen}>
+                  {/* <FullscreenButton onPress={onToggleFullscreen}>
                     <Icon
                       name={isFullscreen ? 'fullscreen-exit' : 'fullscreen'}
                       size={20}
                       color="#fff"
                     />
-                  </FullscreenButton>
+                  </FullscreenButton> */}
                 </BottomControlsContainer>
               </>
             )}

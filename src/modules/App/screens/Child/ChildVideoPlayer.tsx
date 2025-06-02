@@ -12,6 +12,7 @@ import { useThemeContext } from '@/context/ThemeContext';
 import Empty from '@/component/app/Empty';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { navigate } from '@/navigation/NavigationService';
+import { useFocusEffect } from '@react-navigation/native';
 
 let timeInterval: NodeJS.Timeout;
 
@@ -32,6 +33,14 @@ const ChildVideoPlayer: React.FC = (props: any) => {
       setIsLoading(false);
     }
   }, [video]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => {
+        setTabBarVisible(true);
+      }
+    }, [])
+  );
 
   const orientationChangeHandler = (orientation: string) => {
     setIsPortrait(orientation.toLowerCase() === 'portrait');

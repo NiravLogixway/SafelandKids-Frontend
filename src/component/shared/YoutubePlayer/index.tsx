@@ -88,6 +88,7 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTit
       if (hideOverlayTimeout) clearTimeout(hideOverlayTimeout);
       setOverlayVisible(true);
       const subscription = Dimensions.addEventListener('change', onDimensionsChange);
+      setDimensions(Dimensions.get('screen'));
       Orientation.addDeviceOrientationListener(orientationChangeHandler);
       Orientation.getOrientation((orientation) => {
         setIsPortrait(orientation.toLowerCase() === 'portrait');

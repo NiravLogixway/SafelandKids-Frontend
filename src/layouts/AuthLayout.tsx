@@ -14,6 +14,7 @@ interface AppLayoutProps {
   titleColor?: string;
   isBack?: boolean;
   navigateLink?: string;
+  isSafeArea?: boolean;
 }
 
 const AuthLayout = ({
@@ -22,6 +23,7 @@ const AuthLayout = ({
   titleColor,
   isBack,
   navigateLink,
+  isSafeArea = true,
 }: AppLayoutProps) => {
   const { theme } = useThemeContext();
   return (
@@ -41,7 +43,9 @@ const AuthLayout = ({
                 isBack={isBack}
                 navigateLink={navigateLink}
               />
-              <AuthContent>{children}</AuthContent>
+              {isSafeArea ? <SafeAreaView edges={['right', 'left']} style={{ flex: 1 }}>
+                <AuthContent>{children}</AuthContent>
+              </SafeAreaView> : <AuthContent>{children}</AuthContent>}
             </AuthContainer>
           </KeyboardAvoidView >
         </ImageBackground>
