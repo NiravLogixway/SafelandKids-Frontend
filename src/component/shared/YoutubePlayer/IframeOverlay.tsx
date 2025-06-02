@@ -9,6 +9,8 @@ import {
   ControlsContainer,
   PlayPauseButton,
   ControlsButton,
+  BottomControlsContainer,
+  FullscreenButton,
 } from './styles';
 import ProgressBar from './ProgressBar';
 import { useThemeContext } from '@/context/ThemeContext';
@@ -30,6 +32,8 @@ interface IframeOverlayProps {
   onMoveNextVideo: () => void;
   onBack: () => void;
   isShowBack?: boolean;
+  isFullscreen: boolean;
+  onToggleFullscreen: () => void;
 }
 
 const IframeOverlay: React.FC<IframeOverlayProps> = ({
@@ -48,6 +52,8 @@ const IframeOverlay: React.FC<IframeOverlayProps> = ({
   onMoveNextVideo,
   onBack,
   isShowBack,
+  isFullscreen,
+  onToggleFullscreen,
 }) => {
   const { theme } = useThemeContext()
   return (
@@ -73,12 +79,23 @@ const IframeOverlay: React.FC<IframeOverlayProps> = ({
                     <Icon name={playing ? 'pause' : 'play-arrow'} size={36} color="#fff" />
                   </PlayPauseButton>
                 </ControlsContainer>
-                <ProgressBar
-                  currentTime={currentTime}
-                  duration={duration}
-                  onSeek={onSeek}
-                  onSeekMove={onSeekMove}
-                />
+                <BottomControlsContainer>
+
+                  <ProgressBar
+                    currentTime={currentTime}
+                    duration={duration}
+                    onSeek={onSeek}
+                    onSeekMove={onSeekMove}
+                  />
+
+                  <FullscreenButton onPress={onToggleFullscreen}>
+                    <Icon
+                      name={isFullscreen ? 'fullscreen-exit' : 'fullscreen'}
+                      size={20}
+                      color="#fff"
+                    />
+                  </FullscreenButton>
+                </BottomControlsContainer>
               </>
             )}
           </ImageBackground>
@@ -104,12 +121,21 @@ const IframeOverlay: React.FC<IframeOverlayProps> = ({
                     <Icon name="rotate-right" size={30} color="#fff" />
                   </ControlsButton>
                 </ControlsContainer>
-                <ProgressBar
-                  currentTime={currentTime}
-                  duration={duration}
-                  onSeek={onSeek}
-                  onSeekMove={onSeekMove}
-                />
+                <BottomControlsContainer>
+                  <ProgressBar
+                    currentTime={currentTime}
+                    duration={duration}
+                    onSeek={onSeek}
+                    onSeekMove={onSeekMove}
+                  />
+                  <FullscreenButton onPress={onToggleFullscreen}>
+                    <Icon
+                      name={isFullscreen ? 'fullscreen-exit' : 'fullscreen'}
+                      size={20}
+                      color="#fff"
+                    />
+                  </FullscreenButton>
+                </BottomControlsContainer>
               </>
             )}
           </View>

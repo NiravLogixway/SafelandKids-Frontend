@@ -19,7 +19,7 @@ export const KidCardWrapper = styled(Pressable)(({theme}) => ({
   elevation: 3,
   overflow: 'hidden',
   height: 100,
-  backgroundColor: theme.colors.surface,
+  backgroundColor: theme.colors.secondary,
   borderRadius: theme.borderRadius.xl,
   padding: theme.spacing.md,
   flexDirection: 'row',

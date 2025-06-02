@@ -127,6 +127,31 @@ export const ControlsContainer = styled(Stack)(() => ({
   flex: 1,
 }));
 
+export const BottomControlsContainer = styled.View(() => ({
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  right: 0,
+  width: '100%',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 16,
+  justifyContent: 'space-between',
+  paddingHorizontal: 16,
+  paddingVertical: 8,
+  backgroundColor: 'rgba(0,0,0,0.25)',
+  zIndex: 2,
+}));
+
+export const FullscreenButton = styled.TouchableOpacity(() => ({
+  position: 'absolute',
+  top: -45,
+  right: 20,
+  padding: 8,
+  borderRadius: 20,
+  backgroundColor: 'rgba(0,0,0,0.6)',
+}));
+
 export const ControlsButton = styled.TouchableOpacity(() => ({
   width: 60,
   height: 60,
@@ -145,11 +170,7 @@ export const PlayPauseButton = styled.TouchableOpacity(() => ({
 }));
 
 export const ProgressBarOuterWrapper = styled.View`
-  position: absolute;
-  left: 5%;
-  right: 5%;
-  bottom: 24px;
-  width: 90%;
+  width: auto;
   align-items: center;
   z-index: 100;
 `;
@@ -163,28 +184,28 @@ export const ProgressBarTimeRow = styled.View`
 
 export const ProgressBarTrack = styled.View`
   width: 100%;
-  height: 8px;
-  background-color: rgba(255, 255, 255, 0.4);
-  border-radius: 4px;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.25);
+  border-radius: 2px;
   justify-content: center;
 `;
 
 export const ProgressBarThumb = styled.View<{progress: number}>`
   position: absolute;
   left: ${props => `${props.progress * 100}%`};
-  top: -6px;
-  margin-left: -10px;
-  width: 20px;
-  height: 20px;
-  border-radius: 10px;
+  top: -5px;
+  margin-left: -7px;
+  width: 14px;
+  height: 14px;
+  border-radius: 7px;
   background-color: #fff;
-  border-width: 2px;
+  border-width: 1.5px;
   border-color: #888;
   shadow-color: #000;
-  shadow-offset: 0px 2px;
-  shadow-opacity: 0.25;
-  shadow-radius: 3.84px;
-  elevation: 5;
+  shadow-offset: 0px 1.5px;
+  shadow-opacity: 0.18;
+  shadow-radius: 2.22px;
+  elevation: 3;
 `;
 
 export const ProgressBarFill = styled.View<{progress: number}>`
@@ -192,7 +213,7 @@ export const ProgressBarFill = styled.View<{progress: number}>`
   height: 100%;
   background-color: #fff;
   position: relative;
-  border-radius: 4px;
+  border-radius: 2px;
 `;
 
 export const TimeText = styled.Text`

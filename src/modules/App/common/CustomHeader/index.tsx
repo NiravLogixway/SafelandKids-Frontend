@@ -21,7 +21,7 @@ const CustomHeader = (props: any) => {
     <>
       <Switch
         value={defaultValue}
-        style={{ marginRight: 8 }}
+        style={{ marginInline: 8 }}
         onChange={handleToggle}
         theme={theme}
         trackColor={{

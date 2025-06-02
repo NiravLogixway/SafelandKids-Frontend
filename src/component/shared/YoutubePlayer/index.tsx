@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { Dimensions, View, ActivityIndicator } from 'react-native';
+import { Dimensions, View, ActivityIndicator, Pressable } from 'react-native';
 import Orientation from 'react-native-orientation-locker';
 import YoutubePlayer, { YoutubeIframeRef } from 'react-native-youtube-iframe';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import bg2Image from '@/assets/images/bg2Image.png';
 import {
   Container,
@@ -49,6 +50,7 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTit
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [videoEnded, setVideoEnded] = useState(false);
   const [isPortrait, setIsPortrait] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [dimensions, setDimensions] = useState(Dimensions.get('screen'));
 
   useEffect(() => {
@@ -64,7 +66,8 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTit
   }, [videoId]);
 
   const orientationChangeHandler = (orientation: string) => {
-    setIsPortrait(orientation.toLowerCase() === ('portrait'));
+    setIsPortrait(orientation.toLowerCase() === 'portrait');
+    setIsFullscreen(orientation.toLowerCase().includes('landscape'));
     onOrientationChange?.(orientation);
   };
 
@@ -88,6 +91,7 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTit
       Orientation.addDeviceOrientationListener(orientationChangeHandler);
       Orientation.getOrientation((orientation) => {
         setIsPortrait(orientation.toLowerCase() === 'portrait');
+        setIsFullscreen(orientation.toLowerCase().includes('landscape'));
         onOrientationChange?.(orientation);
       });
 
@@ -212,6 +216,20 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTit
     }
   }
 
+  const toggleFullscreen = () => {
+    if (isFullscreen) {
+      Orientation.unlockAllOrientations();
+      Orientation.lockToPortrait();
+    } else {
+      Orientation.unlockAllOrientations();
+      Orientation.lockToLandscape()
+    }
+    orientationChangeHandler(isFullscreen ? 'portrait' : 'landscape');
+    setTimeout(() => {
+      setDimensions(Dimensions.get('screen'));
+    }, 100);
+  };
+
   return (
     <PlayerContainer>
       <PlayerOverlay width={dimensions.width} height={dimensions.height} isPortrait={isPortrait} />
@@ -268,6 +286,8 @@ const YouTubePlayer: React.FC<YouTubeWebViewProps> = ({ video, videoId, videoTit
                 onBack={() => {
                   navigationRef.current?.goBack();
                 }}
+                isFullscreen={isFullscreen}
+                onToggleFullscreen={toggleFullscreen}
               />
             </Stack>
           </Container>

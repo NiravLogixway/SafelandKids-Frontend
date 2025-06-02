@@ -52,20 +52,17 @@ export const VideoPreviewImage = styled.Image(({theme}) => ({
 
 export const VideoLinkContainer = styled(Stack)(({theme}) => ({
   marginBottom: 16,
-  backgroundColor: theme.colors.surface,
+  backgroundColor: theme.colors.background.secondary,
   borderRadius: 8,
-  padding: 12,
+  paddingBlock: 16,
+  paddingHorizontal: 16,
   position: 'relative',
 }));
 
 export const VideoLinkInputWrapper = styled(Stack)(({theme}) => ({
-  backgroundColor: theme.colors.background.secondary,
-  borderRadius: theme.borderRadius.md,
-  paddingHorizontal: 13,
-  paddingVertical: 10,
   flexDirection: 'row',
   alignItems: 'center',
-  gap: 8,
+  gap: 16,
 }));
 
 export const VideoPreviewCardContainer = styled(Stack)(({theme}) => ({

@@ -21,6 +21,7 @@ interface AppLayoutProps {
   isPrivate?: boolean;
   initialLoader?: boolean;
   isShowLoader?: boolean;
+  isSafeArea?: boolean;
 }
 
 const AppLayout = ({
@@ -31,6 +32,7 @@ const AppLayout = ({
   isBack,
   navigateLink,
   isShowLoader = true,
+  isSafeArea = true,
 }: AppLayoutProps) => {
   const { theme } = useThemeContext();
   const { isTabBarVisible } = useTabContext();
@@ -60,7 +62,9 @@ const AppLayout = ({
                 isBack={isBack}
                 navigateLink={navigateLink}
               />}
-              <AppContent>{children}</AppContent>
+              {isSafeArea ? <SafeAreaView edges={['right', 'left']} style={{ flex: 1 }}>
+                <AppContent>{children}</AppContent>
+              </SafeAreaView> : <AppContent>{children}</AppContent>}
             </AppContainer>
           </KeyboardAvoidView >
         </ImageBackground>

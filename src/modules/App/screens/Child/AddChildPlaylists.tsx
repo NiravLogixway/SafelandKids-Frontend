@@ -92,7 +92,7 @@ const VideoLinkInput: React.FC<VideoLinkInputProps> = ({ value, onPaste, onRemov
         </VideoLinkRemoveButton>
       )} */}
       {error && (
-        <Typography variant="body2" color={theme.colors.error} style={{ marginTop: theme.spacing.sm }}>
+        <Typography variant="body2" color={theme.colors.errorLightText} style={{ marginTop: theme.spacing.sm }}>
           {error}
         </Typography>
       )}
@@ -362,6 +362,11 @@ const AddChildPlaylists = (props: any) => {
     setLoading(false);
   };
 
+  const addMoreVideos = () => {
+    setMode('input');
+    handleAddMore();
+  }
+
   const renderEmptyState = () => {
     if (loading) {
       return (
@@ -425,7 +430,7 @@ const AddChildPlaylists = (props: any) => {
           </ScrollView>
           {videos.length > 0 && (
             <Stack direction="row" gap={2} mb={theme.spacing.xs} style={{ marginTop: 'auto', paddingTop: theme.spacing.md }}>
-              <GradientButton onPress={() => setMode('input')} iconName="add" loading={loading}>
+              <GradientButton onPress={addMoreVideos} iconName="add" loading={loading}>
                 Add Video Link(s)
               </GradientButton>
               <GradientButton onPress={handleFinish} iconName="check" loading={loading} showLoading>

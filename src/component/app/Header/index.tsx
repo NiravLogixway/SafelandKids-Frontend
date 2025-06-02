@@ -2,7 +2,7 @@ import React from 'react';
 import Stack from '@/component/shared/Stack';
 import Box from '@/component/shared/Box';
 import { useSelector } from 'react-redux';
-import { TouchableOpacity } from 'react-native';
+import { Image, TouchableOpacity } from 'react-native';
 import Typography from '@/component/shared/Typography';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { navigate, goBackWithDispatch } from '@/navigation/NavigationService';
@@ -51,6 +51,7 @@ const Header = ({
               <Icon name="chevron-back" size={24} color={theme.colors.text.textPrimary} />
             </TouchableOpacity>
           )}
+          <Image source={require('@/assets/images/header-logo.png')} />
           {header ? header : <Typography variant="h2" weight={600} color={titleColor} style={{ marginBottom: 2 }}>{title}</Typography>}
         </Stack>}
       </Stack>

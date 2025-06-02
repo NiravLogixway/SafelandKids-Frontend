@@ -58,7 +58,7 @@ const Menu = ({
             {customToggle ? (
               customToggle()
             ) : (
-              <Icon source={'dots-vertical'} size={18} color={theme.colors.formButtonBackground} {...props.icon} />
+              <Icon source={'dots-vertical'} size={18} color={theme.colors.text.primary} {...props.icon} />
             )}
           </View>
         </TouchableWithoutFeedback>

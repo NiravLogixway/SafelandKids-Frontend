@@ -93,15 +93,16 @@ const Home = () => {
               if (item.id) handleToggle(item);
             }}
             style={{ marginRight: 16 }}
-            theme={theme}
             trackColor={{
-              true: theme.colors.secondary,
-              false: theme.colors.secondary,
+              true: theme.colors.inverseOnSurface,
+              false: theme.colors.inverseOnSurface,
             }}
-            color={theme.colors.onSecondary}
+            color={theme.colors.secondary}
+            thumbColor={theme.colors.onPrimary}
+            ios_backgroundColor={theme.colors.inverseOnSurface}
           />
         </Pressable>
-        <Typography variant="body1" weight={500}>{item.firstName} {item.lastName}</Typography>
+        <Typography variant="body1" weight={500} color={theme.colors.text.primary}>{item.firstName} {item.lastName}</Typography>
       </Stack>
       <Menu
         menuItems={menuItems}
